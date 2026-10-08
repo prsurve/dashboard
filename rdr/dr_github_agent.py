@@ -926,7 +926,7 @@ class DRGitHubAgent:
 <h1>🔵 RDR Dashboard — {_e(OWNER_REPO)}</h1>
 <div class="sub">
   Generated {_e(generated_at)} &nbsp;·&nbsp; {len(prs)} PR(s) matched
-  &nbsp;·&nbsp; <span style="color:#1a7f37">⏰ auto-refreshes daily at 07:00 UTC</span>
+  &nbsp;·&nbsp; <span style="color:#1a7f37">⏰ auto-refreshes daily at 03:00 UTC</span>
 </div>
 
 <div class="tabs">
@@ -965,7 +965,7 @@ class DRGitHubAgent:
 <div id="tab-metrics" class="tab-panel">
 
   <div class="auto-note">
-    ⏰ This page is <strong>auto-generated daily at 07:00 UTC</strong> by GitHub Actions
+    ⏰ This page is <strong>auto-generated daily at 03:00 UTC</strong> by GitHub Actions
     — no manual run needed. Bookmark the URL and share with your team.
   </div>
 
@@ -1030,7 +1030,7 @@ class DRGitHubAgent:
 
 <div class="footer">
   RDR Dashboard &nbsp;·&nbsp; {_e(OWNER_REPO)} &nbsp;·&nbsp; {_e(generated_at)}
-  &nbsp;·&nbsp; auto-refreshes daily at 07:00 UTC
+  &nbsp;·&nbsp; auto-refreshes daily at 03:00 UTC
 </div>
 
 <script>
