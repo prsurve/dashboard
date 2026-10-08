@@ -997,10 +997,27 @@ class DRGitHubAgent:
   h2   {{ font-size:15px; font-weight:600; margin:24px 0 10px; color:#24292f; }}
   .sub {{ font-size:12px; color:#57606a; margin-bottom:20px; }}
   .cards {{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px; }}
-  .stat-card {{ cursor:pointer; }}
-  .stat-card:hover {{ box-shadow:0 0 0 2px #3b82d4; border-color:#3b82d4 !important; }}
-  .stat-card.active {{ box-shadow:0 0 0 2px currentColor; outline:2px solid #3b82d4;
-                       outline-offset:-1px; background:#eaf3ff !important; }}
+  .stat-card {{
+    cursor:pointer;
+    padding:10px 18px;
+    border:1.5px solid #d0d7de;
+    border-radius:10px;
+    background:#f6f8fa;
+    text-align:center;
+    min-width:80px;
+    transition:border-color .15s, background .15s, box-shadow .15s;
+    user-select:none;
+  }}
+  .stat-card:hover {{
+    border-color:#3b82d4;
+    background:#eaf3ff;
+    box-shadow:0 2px 6px rgba(59,130,212,.18);
+  }}
+  .stat-card.active {{
+    border-color:#0969da;
+    background:#dbeafe;
+    box-shadow:0 0 0 2px #0969da;
+  }}
   /* ── tabs ── */
   .tabs     {{ display:flex; gap:0; border-bottom:2px solid #d0d7de; margin-bottom:20px; }}
   .tab-btn  {{ padding:8px 20px; font-size:13px; font-weight:600; color:#57606a;
