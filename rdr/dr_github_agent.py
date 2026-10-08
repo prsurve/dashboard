@@ -50,6 +50,7 @@ import json
 import logging
 import os
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
@@ -419,12 +420,20 @@ class DRGitHubAgent:
             params={"state": state, "sort": "updated", "direction": "desc"},
         )
 
-    def list_rdr_prs(self, state: str = "open") -> List[Dict[str, Any]]:
+    def list_rdr_prs(
+        self, state: str = "open", workers: int = 10
+    ) -> List[Dict[str, Any]]:
         """
         Return all RDR-related PRs enriched with review, label, CI and age data.
 
+        API calls for each PR (reviews + files) are fetched concurrently using a
+        thread pool, cutting wall-clock time from O(N) serial requests to roughly
+        O(N/workers).  Default is 10 workers which stays well inside GitHub's
+        per-token rate limit of 5000 req/h.
+
         Args:
-            state: ``"open"``, ``"closed"``, or ``"all"``.
+            state:   ``"open"``, ``"closed"``, or ``"all"``.
+            workers: Max concurrent threads for the enrichment phase (default 10).
 
         Returns:
             List of enriched PR dicts sorted by PR number descending.
@@ -434,14 +443,25 @@ class DRGitHubAgent:
         logger.info(f"Total PRs fetched: {len(raw_prs)}.  Filtering for RDR …")
 
         rdr_prs = [pr for pr in raw_prs if _is_rdr_related(pr)]
-        logger.info(f"RDR-related PRs found: {len(rdr_prs)}.  Enriching …")
+        total = len(rdr_prs)
+        logger.info(f"RDR-related PRs found: {total}.  Enriching with {workers} workers …")
 
-        enriched: List[Dict[str, Any]] = []
-        for i, pr in enumerate(rdr_prs, 1):
+        enriched: List[Dict[str, Any]] = [None] * total  # type: ignore[list-item]
+
+        def _enrich_indexed(idx: int, pr: Dict) -> tuple:
             logger.info(
-                f"  [{i}/{len(rdr_prs)}] Enriching PR #{pr['number']}: {pr['title'][:60]}"
+                f"  [{idx + 1}/{total}] Enriching PR #{pr['number']}: {pr['title'][:60]}"
             )
-            enriched.append(_enrich_pr(pr, self.token, self.fetch_checks))
+            return idx, _enrich_pr(pr, self.token, self.fetch_checks)
+
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            futures = {
+                pool.submit(_enrich_indexed, i, pr): i
+                for i, pr in enumerate(rdr_prs)
+            }
+            for future in as_completed(futures):
+                idx, result = future.result()
+                enriched[idx] = result
 
         enriched.sort(key=lambda p: p["number"], reverse=True)
         return enriched
@@ -1377,6 +1397,13 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Post the summary to a Slack channel via Incoming Webhook URL",
     )
     p.add_argument(
+        "--workers",
+        type=int,
+        default=10,
+        metavar="N",
+        help="Parallel threads for PR enrichment API calls (default: 10)",
+    )
+    p.add_argument(
         "--debug",
         action="store_true",
         help="Enable debug logging",
@@ -1399,7 +1426,7 @@ def main() -> None:
         fetch_checks=not args.no_checks,
     )
 
-    prs = agent.list_rdr_prs(state=args.state)
+    prs = agent.list_rdr_prs(state=args.state, workers=args.workers)
 
     if args.as_json:
         print(json.dumps(prs, indent=2, default=str))

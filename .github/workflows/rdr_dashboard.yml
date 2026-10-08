@@ -41,6 +41,8 @@ jobs:
       # GITHUB_TOKEN   — auto-provided, gives 5000 req/h (no PAT needed)
       # --repo         — always points at the upstream ocs-ci repo
       # --no-checks    — skips check-run API calls (faster, stays inside limits)
+      # --workers 10   — fetches reviews+files for 10 PRs in parallel;
+      #                  cuts 12 min serial runtime down to ~1-2 min
       - name: Generate HTML report
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -49,6 +51,7 @@ jobs:
             --repo red-hat-storage/ocs-ci \
             --state ${{ github.event.inputs.state || 'all' }} \
             --no-checks \
+            --workers 10 \
             --html /tmp/index.html
           echo "Report generated."
 
