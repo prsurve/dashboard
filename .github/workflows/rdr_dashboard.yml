@@ -1,0 +1,74 @@
+name: RDR PR Dashboard
+
+# ── Triggers ──────────────────────────────────────────────────────────────────
+# • Scheduled : every day at 07:00 UTC
+# • Manual    : Actions → RDR PR Dashboard → Run workflow
+on:
+  schedule:
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+    inputs:
+      state:
+        description: "PR state to include"
+        required: false
+        default: "open"
+        type: choice
+        options: [open, all, closed]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    name: Generate RDR Dashboard
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      # Generates a self-contained HTML file.
+      # GITHUB_TOKEN   — auto-provided, gives 5000 req/h (no PAT needed)
+      # --repo         — always points at the upstream ocs-ci repo
+      # --no-checks    — skips check-run API calls (faster, stays inside limits)
+      - name: Generate HTML report
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python rdr/dr_github_agent.py \
+            --repo red-hat-storage/ocs-ci \
+            --state ${{ github.event.inputs.state || 'open' }} \
+            --no-checks \
+            --html /tmp/index.html
+          echo "Report generated."
+
+      - name: Prepare Pages directory
+        run: |
+          mkdir -p /tmp/pages/rdr
+          cp /tmp/index.html /tmp/pages/rdr/index.html
+          echo "theme: ~" > /tmp/pages/_config.yml
+          echo "Built: $(date -u '+%Y-%m-%d %H:%M UTC')" > /tmp/pages/build.txt
+
+      # Pushes to gh-pages branch.  keep_files:true means other dashboards
+      # (mcg/, mdr/, …) already on gh-pages are never overwritten.
+      # Dashboard URL: https://prsurve.github.io/dashboard/rdr/
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: /tmp/pages
+          publish_branch: gh-pages
+          commit_message: "chore: update RDR dashboard [skip ci]"
+          user_name: "github-actions[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"
+          keep_files: true
