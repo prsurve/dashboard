@@ -657,28 +657,41 @@ class DRGitHubAgent:
             )
             by_ci[pr["ci_status"]] = by_ci.get(pr["ci_status"], 0) + 1
 
-        def _stat_card(label: str, value: Any, color: str = "#24292f") -> str:
+        def _stat_card(
+            label: str,
+            value: Any,
+            color: str = "#24292f",
+            filter_val: str = "",
+        ) -> str:
+            """Render a stat card.  If filter_val is set the card is clickable
+            and calls filterByStatus(filter_val) on click."""
+            if filter_val:
+                onclick = f' onclick="filterByStatus(\'{filter_val}\',this)"'
+            else:
+                onclick = ' onclick="filterByStatus(\'all\',this)"'
             return (
-                f'<div style="background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;'
-                f'padding:12px 20px;text-align:center;min-width:80px">'
+                f'<div class="stat-card" data-filter="{_e(filter_val or "all")}"'
+                f' {onclick}'
+                f' style="background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;'
+                f'padding:12px 20px;text-align:center;min-width:80px;transition:box-shadow .15s">'
                 f'<div style="font-size:22px;font-weight:700;color:{color}">{_e(value)}</div>'
                 f'<div style="font-size:11px;color:#57606a;margin-top:2px">{_e(label)}</div>'
                 f"</div>"
             )
 
-        summary_cards = _stat_card("Total PRs", len(prs), "#3b82d4")
+        summary_cards = _stat_card("Total PRs", len(prs), "#3b82d4", "all")
         for st, cnt in sorted(by_status.items()):
             summary_cards += _stat_card(
-                st.capitalize(), cnt, STATUS_COLOR.get(st, "#57606a")
+                st.capitalize(), cnt, STATUS_COLOR.get(st, "#57606a"), st
             )
         approved_count = by_review.get("APPROVED", 0)
         pending_count = by_review.get("PENDING", 0) + by_review.get("COMMENTED", 0)
         changes_count = by_review.get("CHANGES_REQUESTED", 0)
-        summary_cards += _stat_card("Approved", approved_count, "#1a7f37")
-        summary_cards += _stat_card("Needs Review", pending_count, "#9a6700")
-        summary_cards += _stat_card("Changes Req.", changes_count, "#cf222e")
+        summary_cards += _stat_card("Approved", approved_count, "#1a7f37", "review:APPROVED")
+        summary_cards += _stat_card("Needs Review", pending_count, "#9a6700", "review:PENDING")
+        summary_cards += _stat_card("Changes Req.", changes_count, "#cf222e", "review:CHANGES_REQUESTED")
         if by_ci.get("failure", 0):
-            summary_cards += _stat_card("CI Failing", by_ci["failure"], "#cf222e")
+            summary_cards += _stat_card("CI Failing", by_ci["failure"], "#cf222e", "ci:failure")
 
         # ── table rows ────────────────────────────────────────────────────────
         rows_html = ""
@@ -718,8 +731,18 @@ class DRGitHubAgent:
             if changes_str:
                 review_detail += f'<div style="font-size:10px;color:#cf222e;margin-top:2px">✘ {_e(changes_str)}</div>'
 
+            pr_status_val = "draft" if pr["draft"] else pr["status"]
+            pr_review_val = pr["review_decision"]
+            pr_ci_val = pr["ci_status"]
+            # open+draft visible by default; closed/merged hidden until filter click
+            default_hidden = (
+                ' style="display:none"'
+                if pr_status_val in ("closed", "merged")
+                else ""
+            )
+
             rows_html += f"""
-            <tr>
+            <tr data-status="{_e(pr_status_val)}" data-review="{_e(pr_review_val)}" data-ci="{_e(pr_ci_val)}"{default_hidden}>
               <td style="white-space:nowrap">
                 <a href="{_e(pr['url'])}" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
                   #{_e(pr['number'])}
@@ -893,6 +916,10 @@ class DRGitHubAgent:
   h2   {{ font-size:15px; font-weight:600; margin:24px 0 10px; color:#24292f; }}
   .sub {{ font-size:12px; color:#57606a; margin-bottom:20px; }}
   .cards {{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px; }}
+  .stat-card {{ cursor:pointer; }}
+  .stat-card:hover {{ box-shadow:0 0 0 2px #3b82d4; border-color:#3b82d4 !important; }}
+  .stat-card.active {{ box-shadow:0 0 0 2px currentColor; outline:2px solid #3b82d4;
+                       outline-offset:-1px; background:#eaf3ff !important; }}
   /* ── tabs ── */
   .tabs     {{ display:flex; gap:0; border-bottom:2px solid #d0d7de; margin-bottom:20px; }}
   .tab-btn  {{ padding:8px 20px; font-size:13px; font-weight:600; color:#57606a;
@@ -1042,6 +1069,51 @@ function showTab(id, btn) {{
   btn.classList.add('active');
 }}
 
+// ── active filter state ───────────────────────────────────────────────────────
+// Tracks what the card buttons have selected so text search can combine with it.
+let _activeFilter = 'open';   // default: show only open PRs on load
+
+// ── card filter ───────────────────────────────────────────────────────────────
+function filterByStatus(val, cardEl) {{
+  _activeFilter = val;
+  // highlight the clicked card
+  document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+  if (cardEl) cardEl.classList.add('active');
+  _applyFilters();
+}}
+
+// ── text search ───────────────────────────────────────────────────────────────
+function filterTable() {{
+  _applyFilters();
+}}
+
+// ── combined filter engine ────────────────────────────────────────────────────
+function _applyFilters() {{
+  const q = document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('#pr-table tbody tr').forEach(row => {{
+    const status = row.dataset.status || '';
+    const review = row.dataset.review || '';
+    const ci     = row.dataset.ci     || '';
+
+    // card filter
+    let cardMatch = true;
+    if (_activeFilter === 'all') {{
+      cardMatch = true;
+    }} else if (_activeFilter.startsWith('review:')) {{
+      cardMatch = review === _activeFilter.slice(7);
+    }} else if (_activeFilter.startsWith('ci:')) {{
+      cardMatch = ci === _activeFilter.slice(3);
+    }} else {{
+      cardMatch = status === _activeFilter;
+    }}
+
+    // text filter
+    const textMatch = !q || row.innerText.toLowerCase().includes(q);
+
+    row.style.display = (cardMatch && textMatch) ? '' : 'none';
+  }});
+}}
+
 // ── sort ──────────────────────────────────────────────────────────────────────
 let _sortCol = -1, _sortAsc = true;
 function sortTable(col) {{
@@ -1065,14 +1137,18 @@ function sortTable(col) {{
   rows.forEach(r => table.tBodies[0].appendChild(r));
 }}
 
-// ── filter ────────────────────────────────────────────────────────────────────
-function filterTable() {{
-  const q    = document.getElementById('search').value.toLowerCase();
-  const rows = document.querySelectorAll('#pr-table tbody tr');
-  rows.forEach(row => {{
-    row.style.display = row.innerText.toLowerCase().includes(q) ? '' : 'none';
-  }});
-}}
+// ── init: activate the Open card on load ─────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {{
+  const openCard = document.querySelector('.stat-card[data-filter="open"]');
+  if (openCard) {{ openCard.classList.add('active'); }}
+  else {{
+    // no open PRs — fall back to showing all
+    _activeFilter = 'all';
+    const allCard = document.querySelector('.stat-card[data-filter="all"]');
+    if (allCard) allCard.classList.add('active');
+    _applyFilters();
+  }}
+}});
 </script>
 </body>
 </html>"""
