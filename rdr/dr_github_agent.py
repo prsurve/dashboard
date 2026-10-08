@@ -683,17 +683,11 @@ class DRGitHubAgent:
             color: str = "#24292f",
             filter_val: str = "",
         ) -> str:
-            """Render a stat card.  If filter_val is set the card is clickable
-            and calls filterByStatus(filter_val) on click."""
-            if filter_val:
-                onclick = f' onclick="filterByStatus(\'{filter_val}\',this)"'
-            else:
-                onclick = ' onclick="filterByStatus(\'all\',this)"'
+            """Render a clickable stat card that toggles a filter."""
+            fv = filter_val or "all"
             return (
-                f'<div class="stat-card" data-filter="{_e(filter_val or "all")}"'
-                f' {onclick}'
-                f' style="background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;'
-                f'padding:12px 20px;text-align:center;min-width:80px;transition:box-shadow .15s">'
+                f'<div class="stat-card" data-filter="{_e(fv)}"'
+                f' onclick="filterByStatus(\'{fv}\',this)">'
                 f'<div style="font-size:22px;font-weight:700;color:{color}">{_e(value)}</div>'
                 f'<div style="font-size:11px;color:#57606a;margin-top:2px">{_e(label)}</div>'
                 f"</div>"
@@ -761,6 +755,8 @@ class DRGitHubAgent:
                 else ""
             )
 
+            base_branch = pr.get("base_branch", "")
+
             rows_html += f"""
             <tr data-status="{_e(pr_status_val)}" data-review="{_e(pr_review_val)}" data-ci="{_e(pr_ci_val)}"{default_hidden}>
               <td style="white-space:nowrap">
@@ -784,6 +780,7 @@ class DRGitHubAgent:
               <td style="font-size:12px;text-align:right">{_e(pr['comments'])}</td>
               <td style="font-size:12px;text-align:right">{_e(pr['files_changed'])}</td>
               <td style="font-size:11px;color:#57606a;white-space:nowrap">{_e(pr.get('milestone') or '—')}</td>
+              <td style="font-size:11px;font-family:monospace;color:#57606a;white-space:nowrap">{_e(base_branch)}</td>
             </tr>"""
 
         # ── metrics computations ──────────────────────────────────────────────
@@ -921,7 +918,71 @@ class DRGitHubAgent:
         if not velocity_rows:
             velocity_rows = '<tr><td colspan="5" style="color:#57606a;text-align:center;padding:16px">No merged PRs in the last 30 days</td></tr>'
 
-        # ── full HTML document (two tabs) ─────────────────────────────────────
+        # ── ready-to-merge scoring ────────────────────────────────────────────
+        # Score each open/draft PR on how close it is to being mergeable.
+        # Max score = 5.  Shown sorted highest-first in the Ready to Merge tab.
+        def _merge_score(pr: Dict) -> int:
+            score = 0
+            if pr["status"] == "open" and not pr["draft"]:
+                score += 1                                          # not a draft
+            if pr["review_decision"] == "APPROVED":
+                score += 2                                          # approved
+            if pr["ci_status"] == "success":
+                score += 1                                          # CI green
+            if not pr["changes_requested_by"]:
+                score += 1                                          # no change requests
+            return score
+
+        SCORE_LABEL = {5: "🟢 Ready", 4: "🟡 Almost", 3: "🟠 Needs work", 2: "🔴 Blocked", 1: "🔴 Blocked", 0: "🔴 Blocked"}
+        SCORE_COLOR = {5: "#1a7f37",  4: "#9a6700",   3: "#e06c10",        2: "#cf222e",    1: "#cf222e",    0: "#cf222e"}
+
+        ready_candidates = [
+            pr for pr in prs if pr["status"] in ("open", "draft")
+        ]
+        ready_candidates.sort(key=_merge_score, reverse=True)
+
+        def _blocker_pills(pr: Dict) -> str:
+            pills = []
+            if pr["draft"]:
+                pills.append(("Draft — mark ready first", "#9a6700"))
+            if pr["review_decision"] != "APPROVED":
+                pills.append(("Needs approval", "#cf222e"))
+            if pr["changes_requested_by"]:
+                pills.append((f"Changes by: {', '.join(pr['changes_requested_by'])}", "#cf222e"))
+            if pr["ci_status"] not in ("success", "skipped"):
+                pills.append((f"CI: {pr['ci_status']}", "#cf222e"))
+            if not pills:
+                pills.append(("All checks passed", "#1a7f37"))
+            return " ".join(
+                f'<span style="display:inline-block;padding:1px 7px;border-radius:10px;'
+                f'font-size:10px;font-weight:600;color:#fff;background:{c}">{_e(t)}</span>'
+                for t, c in pills
+            )
+
+        ready_rows = ""
+        for pr in ready_candidates:
+            score     = _merge_score(pr)
+            score_lbl = SCORE_LABEL.get(score, "🔴 Blocked")
+            score_col = SCORE_COLOR.get(score, "#cf222e")
+            ready_rows += (
+                f'<tr>'
+                f'<td style="white-space:nowrap">'
+                f'<a href="{_e(pr["url"])}" target="_blank" '
+                f'style="color:#0969da;font-weight:600">#{_e(pr["number"])}</a></td>'
+                f'<td style="font-size:12px">'
+                f'<a href="{_e(pr["url"])}" target="_blank" style="color:#24292f">'
+                f'{_e(pr["title"][:60])}{"…" if len(pr["title"])>60 else ""}</a></td>'
+                f'<td style="font-size:12px;color:#57606a;white-space:nowrap">{_e(pr["author"])}</td>'
+                f'<td style="font-family:monospace;font-size:11px;color:#57606a">{_e(pr.get("base_branch",""))}</td>'
+                f'<td style="font-weight:700;color:{score_col};white-space:nowrap">{score_lbl} ({score}/5)</td>'
+                f'<td style="font-size:11px">{_blocker_pills(pr)}</td>'
+                f'<td style="white-space:nowrap;font-size:12px">{_e(pr["age_days"])}d</td>'
+                f'</tr>'
+            )
+        if not ready_rows:
+            ready_rows = '<tr><td colspan="7" style="color:#57606a;text-align:center;padding:16px">No open PRs found</td></tr>'
+
+        # ── full HTML document (three tabs) ───────────────────────────────────
         document = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -979,6 +1040,7 @@ class DRGitHubAgent:
 <div class="tabs">
   <button class="tab-btn active" onclick="showTab('prs',this)">📋 Pull Requests</button>
   <button class="tab-btn" onclick="showTab('metrics',this)">📊 Metrics</button>
+  <button class="tab-btn" onclick="showTab('ready',this)">🚀 Ready to Merge</button>
 </div>
 
 <!-- ═══════════════════════ TAB 1 : PR TABLE ════════════════════════════════ -->
@@ -1001,6 +1063,7 @@ class DRGitHubAgent:
         <th onclick="sortTable(10)">💬</th>
         <th onclick="sortTable(11)">Files</th>
         <th onclick="sortTable(12)">Milestone</th>
+        <th onclick="sortTable(13)">Target Branch</th>
       </tr>
     </thead>
     <tbody>{rows_html}
@@ -1070,6 +1133,32 @@ class DRGitHubAgent:
       </tr>
     </thead>
     <tbody>{velocity_rows}
+    </tbody>
+  </table>
+
+</div>
+
+<!-- ═══════════════════════ TAB 3 : READY TO MERGE ══════════════════════════ -->
+<div id="tab-ready" class="tab-panel">
+
+  <div class="auto-note">
+    PRs are scored 0–5: +1 not a draft · +2 approved · +1 CI green · +1 no change requests.
+    Only open / draft PRs are listed.
+  </div>
+
+  <table id="ready-table">
+    <thead>
+      <tr>
+        <th onclick="sortReadyTable(0)">#</th>
+        <th onclick="sortReadyTable(1)">Title</th>
+        <th onclick="sortReadyTable(2)">Author</th>
+        <th onclick="sortReadyTable(3)">Target Branch</th>
+        <th onclick="sortReadyTable(4)">Score</th>
+        <th>Blockers</th>
+        <th onclick="sortReadyTable(6)">Age</th>
+      </tr>
+    </thead>
+    <tbody>{ready_rows}
     </tbody>
   </table>
 
@@ -1186,6 +1275,53 @@ function sortTable(col) {{
   }});
   rows.forEach(r => table.tBodies[0].appendChild(r));
 }}
+
+// ── sort for ready-to-merge table ────────────────────────────────────────────
+let _rsortCol = -1, _rsortAsc = true;
+function sortReadyTable(col) {{
+  const table = document.getElementById('ready-table');
+  const ths   = table.querySelectorAll('th');
+  const rows  = Array.from(table.tBodies[0].rows);
+  if (_rsortCol === col) {{ _rsortAsc = !_rsortAsc; }}
+  else {{ _rsortCol = col; _rsortAsc = true; }}
+  ths.forEach(th => {{ th.classList.remove('asc','desc'); }});
+  ths[col].classList.add(_rsortAsc ? 'asc' : 'desc');
+  rows.sort((a, b) => {{
+    let av = a.cells[col].innerText.trim();
+    let bv = b.cells[col].innerText.trim();
+    if ([0, 4, 6].includes(col)) {{
+      av = parseFloat(av.replace(/[^0-9.]/g, '')) || 0;
+      bv = parseFloat(bv.replace(/[^0-9.]/g, '')) || 0;
+      return _rsortAsc ? av - bv : bv - av;
+    }}
+    return _rsortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
+  }});
+  rows.forEach(r => table.tBodies[0].appendChild(r));
+}}
+
+// ── column resize (drag right edge of any <th>) ───────────────────────────────
+(function() {{
+  let _th = null, _startX = 0, _startW = 0;
+  document.addEventListener('mousemove', function(e) {{
+    if (!_th) return;
+    const w = Math.max(40, _startW + e.clientX - _startX);
+    _th.style.width = w + 'px';
+    _th.style.minWidth = w + 'px';
+  }});
+  document.addEventListener('mouseup', function() {{ _th = null; }});
+  document.querySelectorAll('th').forEach(function(th) {{
+    th.style.position = 'relative';
+    const handle = document.createElement('div');
+    handle.style.cssText = 'position:absolute;right:0;top:0;width:6px;height:100%;cursor:col-resize;z-index:1';
+    handle.addEventListener('mousedown', function(e) {{
+      e.preventDefault();
+      _th = th;
+      _startX = e.clientX;
+      _startW = th.offsetWidth;
+    }});
+    th.appendChild(handle);
+  }});
+}})();
 
 // ── init: select Open by default, fall back to all ───────────────────────────
 document.addEventListener('DOMContentLoaded', function() {{
