@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RDR Pull Requests — red-hat-storage/ocs-ci</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px;
+          background:#ffffff; color:#24292f; padding:24px; }
+  h1   { font-size:20px; font-weight:700; margin-bottom:4px; }
+  .sub { font-size:12px; color:#57606a; margin-bottom:20px; }
+  .cards { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th    { background:#f6f8fa; border:1px solid #d0d7de; padding:8px 10px;
+           text-align:left; font-size:12px; font-weight:600; color:#57606a;
+           cursor:pointer; white-space:nowrap; user-select:none; }
+  th:hover { background:#eaeef2; }
+  th.asc::after  { content:" ▲"; font-size:9px; }
+  th.desc::after { content:" ▼"; font-size:9px; }
+  td    { border:1px solid #d0d7de; padding:7px 10px; vertical-align:top; }
+  tr:hover td { background:#f6f8fa; }
+  input#search { width:100%; max-width:400px; padding:6px 10px; margin-bottom:14px;
+                  border:1px solid #d0d7de; border-radius:6px; font-size:13px; }
+  .footer { margin-top:24px; font-size:11px; color:#57606a; text-align:center;
+             border-top:1px solid #d0d7de; padding-top:12px; }
+</style>
+</head>
+<body>
+<h1>🔵 RDR Pull Requests — red-hat-storage/ocs-ci</h1>
+<div class="sub">Generated 2026-10-08 08:41 UTC &nbsp;·&nbsp; 50 PR(s) matched</div>
+
+<div class="cards"><div style="background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:12px 20px;text-align:center;min-width:80px"><div style="font-size:22px;font-weight:700;color:#3b82d4">50</div><div style="font-size:11px;color:#57606a;margin-top:2px">Total PRs</div></div><div style="background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:12px 20px;text-align:center;min-width:80px"><div style="font-size:22px;font-weight:700;color:#9a6700">2</div><div style="font-size:11px;color:#57606a;margin-top:2px">Draft</div></div><div style="background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:12px 20px;text-align:center;min-width:80px"><div style="font-size:22px;font-weight:700;color:#1a7f37">48</div><div style="font-size:11px;color:#57606a;margin-top:2px">Open</div></div><div style="background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:12px 20px;text-align:center;min-width:80px"><div style="font-size:22px;font-weight:700;color:#1a7f37">10</div><div style="font-size:11px;color:#57606a;margin-top:2px">Approved</div></div><div style="background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:12px 20px;text-align:center;min-width:80px"><div style="font-size:22px;font-weight:700;color:#9a6700">38</div><div style="font-size:11px;color:#57606a;margin-top:2px">Needs Review</div></div><div style="background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:12px 20px;text-align:center;min-width:80px"><div style="font-size:22px;font-weight:700;color:#cf222e">2</div><div style="font-size:11px;color:#57606a;margin-top:2px">Changes Req.</div></div></div>
+
+<input id="search" type="search" placeholder="Filter by title, author, label…" oninput="filterTable()">
+
+<table id="pr-table">
+  <thead>
+    <tr>
+      <th onclick="sortTable(0)">#</th>
+      <th onclick="sortTable(1)">Title</th>
+      <th onclick="sortTable(2)">Author</th>
+      <th onclick="sortTable(3)">Status</th>
+      <th onclick="sortTable(4)">Review</th>
+      <th onclick="sortTable(5)">CI</th>
+      <th onclick="sortTable(6)">Age</th>
+      <th>Labels</th>
+      <th onclick="sortTable(8)">Assignees</th>
+      <th>Req. Reviewers</th>
+      <th onclick="sortTable(10)">💬</th>
+      <th onclick="sortTable(11)">Files</th>
+      <th onclick="sortTable(12)">Milestone</th>
+    </tr>
+  </thead>
+  <tbody>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16501" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16501
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16501" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="rdr: add StatefulSet workload support for dr_workload and discovered_…">rdr: add StatefulSet workload support for dr_workload and discovered_…</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">prsurve</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">0d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">3</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16482" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16482
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16482" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Integrate ramenctl e2e tests for RDR deployment validation">Integrate ramenctl e2e tests for RDR deployment validation</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">kumarsgoyal</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">3d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">4</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16454" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16454
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16454" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Add test_workload_deploy_rdr: deploy all RDR workload types in one test">Add test_workload_deploy_rdr: deploy all RDR workload types in one test</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">prsurve</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">6d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">1</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16453" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16453
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16453" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="conf/dr_workload: remove dead workload_dir paths for deleted rdr/ dirs">conf/dr_workload: remove dead workload_dir paths for deleted rdr/ dirs</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">prsurve</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">6d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">3</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16448" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16448
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16448" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="[release-4.22] remove rbd/cephfs_dr_scenario flags; reorder RDR deploy steps">[release-4.22] remove rbd/cephfs_dr_scenario flags; reorder RDR deploy steps</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">openshift-cherrypick-robot</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">APPROVED</span><div style="font-size:10px;color:#57606a;margin-top:2px">✔ petr-balogh</div></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">7d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">lgtm</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">petr-balogh, prsurve</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">5</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16447" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16447
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16447" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="[master] Fix RDR deployment failure due to mon slow ops">[master] Fix RDR deployment failure due to mon slow ops</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">openshift-cherrypick-robot</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">APPROVED</span><div style="font-size:10px;color:#57606a;margin-top:2px">✔ shylesh, vavuthu</div></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">7d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">lgtm</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">shylesh, petr-balogh, vavuthu</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">1</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16412" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16412
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16412" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Add verification test for DFBUGS-11285: DRPC shows PeerReady True and DR Status Healthy when secondary VRG ">Add verification test for DFBUGS-11285: DRPC shows PeerReady True and DR Status Healthy when secondary VRG </a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">ebenahar</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">7d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">automation-for-bug-verification</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">4</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16410" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16410
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16410" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Add verification test for DFBUGS-10229: VolumeSnapshots orphaned on primary cluster after DR operation follow">Add verification test for DFBUGS-10229: VolumeSnapshots orphaned on primary cluster after DR operation follow</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">ebenahar</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#9a6700">PENDING</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">7d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">automation-for-bug-verification</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">sidhant-agrawal, jilju</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">3</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16409" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16409
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16409" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Add verification test for DFBUGS-9859: DR Policy for third party stroage gets validated even with invalid ">Add verification test for DFBUGS-9859: DR Policy for third party stroage gets validated even with invalid </a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">ebenahar</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">7d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">automation-for-bug-verification</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">amr1ta</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">8</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16390" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16390
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16390" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="feat: add Bob RDR test-writer agent, skill, and examples">feat: add Bob RDR test-writer agent, skill, and examples</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">prsurve</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">9d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/XXL</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">ebenahar</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">21</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16366" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16366
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16366" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="RHSTOR-8290: add FDF standalone DR pipeline configs (RDR + MDR)">RHSTOR-8290: add FDF standalone DR pipeline configs (RDR + MDR)</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">suchita-g</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#9a6700">PENDING</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">13d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/M</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">2</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16328" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16328
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16328" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="fix(oadp): skip subscription creation in do_deploy_oadp if already pr…">fix(oadp): skip subscription creation in do_deploy_oadp if already pr…</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">prsurve</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">APPROVED</span><div style="font-size:10px;color:#57606a;margin-top:2px">✔ sidhant-agrawal, amr1ta</div></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">15d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Verified</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/S</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">lgtm</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">sidhant-agrawal, amr1ta</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">1</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16325" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16325
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16325" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Skip ACM IDMS creation and MCP wait if already present">Skip ACM IDMS creation and MCP wait if already present</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">prsurve</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">APPROVED</span><div style="font-size:10px;color:#57606a;margin-top:2px">✔ amr1ta, sidhant-agrawal, vavuthu</div></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">15d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Verified</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/M</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">lgtm</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">sidhant-agrawal, vavuthu, amr1ta</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">2</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16321" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16321
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16321" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Auto-detect existing Submariner installation via CLI before deployment">Auto-detect existing Submariner installation via CLI before deployment</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">prsurve</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">APPROVED</span><div style="font-size:10px;color:#57606a;margin-top:2px">✔ amr1ta, sidhant-agrawal, vavuthu</div></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">15d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Verified</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">lgtm</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">shylesh, sidhant-agrawal, vavuthu, amr1ta</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">1</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16303" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16303
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16303" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Add RDR LitmusChaos-inspired disruption tests and chaos helpers">Add RDR LitmusChaos-inspired disruption tests and chaos helpers</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">prsurve</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">17d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/XXL</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">2</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16300" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16300
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16300" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Reduce RDR resource deletion wait timeout to 1000s">Reduce RDR resource deletion wait timeout to 1000s</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">sidhant-agrawal</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#9a6700">draft</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#9a6700">PENDING</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">19d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/XS</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">DR</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">do-not-merge/work-in-progress</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">1</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16276" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16276
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16276" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Add batch Failover/Relocate test for Protected Applications page">Add batch Failover/Relocate test for Protected Applications page</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">RHdshelar</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">21d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">DanielOsypenko</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">4</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16267" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16267
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16267" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="[release-4.20] Backport RDR test enhancements and fixes">[release-4.20] Backport RDR test enhancements and fixes</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">sidhant-agrawal</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#9a6700">PENDING</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">22d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Verified</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/XXL</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">DR</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">17</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16219" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16219
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16219" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="fix: use bool and clear globalnetCIDRRange when globalnet is disabled">fix: use bool and clear globalnetCIDRRange when globalnet is disabled</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">prsurve</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#9a6700">PENDING</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">26d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/XS</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">1</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16217" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16217
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16217" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Wait for DRPC Completed after DR workload deploy">Wait for DRPC Completed after DR workload deploy</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">sidhant-agrawal</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">APPROVED</span><div style="font-size:10px;color:#57606a;margin-top:2px">✔ jilju</div></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">26d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Verified</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/M</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">lgtm</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">DR</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">jilju</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">2</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16171" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16171
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16171" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="dr_helpers: skip VolumeSnapshot check when skip_vs_check is set">dr_helpers: skip VolumeSnapshot check when skip_vs_check is set</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">prsurve</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">29d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Verified</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/S</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">1</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16169" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16169
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16169" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Add MirrorPeer automation for RDR [RHSTOR-8574]">Add MirrorPeer automation for RDR [RHSTOR-8574]</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">RHdshelar</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#cf222e">CHANGES_REQUESTED</span><div style="font-size:10px;color:#cf222e;margin-top:2px">✘ prsurve</div></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">29d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Verified</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">new feature</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">DR</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">prsurve, DanielOsypenko</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">3</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16141" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16141
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16141" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Improve RDR discovered apps workload teardown">Improve RDR discovered apps workload teardown</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">prsurve</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">30d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/XL</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">DR</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">3</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16103" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16103
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16103" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="dynamic update of drpolicy">dynamic update of drpolicy</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">keemano</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">33d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/M</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">needs-rebase</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">2</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16071" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16071
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16071" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="[release-4.22] Add Support for Running RDR Test on Disconnected Env">[release-4.22] Add Support for Running RDR Test on Disconnected Env</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">openshift-cherrypick-robot</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#9a6700">PENDING</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">37d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">prsurve</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">10</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16069" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16069
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16069" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="RHSTOR-8222/OCSQE-5015: Add OpenShift Lightspeed (OLS) DR Recipe generation support">RHSTOR-8222/OCSQE-5015: Add OpenShift Lightspeed (OLS) DR Recipe generation support</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">prsurve</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">APPROVED</span><div style="font-size:10px;color:#57606a;margin-top:2px">✔ asn1809</div></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">37d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Verified</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/XXL</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">11</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16057" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #16057
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/16057" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Add Prometheus CLI fallback for ApplicationCleanupPending alert verification">Add Prometheus CLI fallback for ApplicationCleanupPending alert verification</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">prsurve</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">38d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">needs-rebase</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">3</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15992" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #15992
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15992" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="dr_helpers: skip validate_application_odf_cli via ENV_DATA flag">dr_helpers: skip validate_application_odf_cli via ENV_DATA flag</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">prsurve</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">APPROVED</span><div style="font-size:10px;color:#57606a;margin-top:2px">✔ sidhant-agrawal</div></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">50d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/S</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">lgtm</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">DR</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">sidhant-agrawal</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">1</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15957" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #15957
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15957" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Test MDR multi ns discovered app failover-relocate for HCI">Test MDR multi ns discovered app failover-relocate for HCI</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">jilju</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">55d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Test Case</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">DR</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">5</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15956" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #15956
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15956" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Test MDR cnv discovered app failover-relocate for HCI">Test MDR cnv discovered app failover-relocate for HCI</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">jilju</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">56d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Test Case</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">DR</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">3</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15664" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #15664
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15664" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Added rdr testcases for custom cephfs pool">Added rdr testcases for custom cephfs pool</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">amr1ta</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">90d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/XL</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">needs-rebase</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">8</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15547" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #15547
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15547" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Consider existing user-ca-bundle certificate and add hostedcluster with trustedCA">Consider existing user-ca-bundle certificate and add hostedcluster with trustedCA</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">jilju</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">99d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">DO NOT MERGE</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/S</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">needs-rebase</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">DR</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">1</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15521" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #15521
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15521" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Implement RDR-Provider Upgrade scenario">Implement RDR-Provider Upgrade scenario</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">shylesh</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">101d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">team/ecosystem</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/XL</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">DR</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">shylesh</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">11</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15233" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #15233
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15233" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Integrate ramenctl e2e tests for RDR deployment validation">Integrate ramenctl e2e tests for RDR deployment validation</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">kumarsgoyal</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">134d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">4</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15200" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #15200
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15200" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Added new test case to validate test run and clean for odf dr cli">Added new test case to validate test run and clean for odf dr cli</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">keemano</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">140d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/M</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">lifecycle/stale</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">needs-rebase</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">DR</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">2</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15189" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #15189
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15189" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Add Ceph health monitoring during RDR StorageCluster wait">Add Ceph health monitoring during RDR StorageCluster wait</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">petr-balogh</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">141d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">lifecycle/stale</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">needs-rebase</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">3</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15099" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #15099
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15099" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Added storage-agnostic Regional DR deployment and failover/relocate testcases">Added storage-agnostic Regional DR deployment and failover/relocate testcases</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">amr1ta</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">153d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/XXL</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">16</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15069" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #15069
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15069" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Rdr upgrade backport 4.17">Rdr upgrade backport 4.17</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">shylesh</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#9a6700">PENDING</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">154d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/XXL</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">lifecycle/stale</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">needs-rebase</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">18</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15057" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #15057
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15057" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="[RDR] Add dryRun failover test for RBD and CephFS workloads">[RDR] Add dryRun failover test for RBD and CephFS workloads</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">am-agrawa</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">155d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/XXL</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">DR</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">am-agrawa</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">6</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15056" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #15056
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/15056" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Use ACM hub cluster if not disconnected else skip subctl download">Use ACM hub cluster if not disconnected else skip subctl download</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">jilju</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">155d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/S</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">lifecycle/stale</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">DR</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">vavuthu</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">1</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/14641" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #14641
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/14641" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Add CNV DR tests for mixed/shared protection types and removal">Add CNV DR tests for mixed/shared protection types and removal</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">amr1ta</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">211d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Verified</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/XXL</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">9</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/14037" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #14037
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/14037" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Add automation for Protected Applications list view feature [RHSTOR-7239]">Add automation for Protected Applications list view feature [RHSTOR-7239]</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">RHdshelar</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">274d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Verified</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/XXL</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">new feature</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">paraggit</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">4</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/13703" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #13703
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/13703" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="DR operation on discovered app for cephfs using custom storage class and pool of replica-2">DR operation on discovered app for cephfs using custom storage class and pool of replica-2</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">Nikhil-Ladha</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">322d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/XL</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">needs-rebase</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">8</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/13325" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #13325
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/13325" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="[RDR] Automation for RDR uninstall">[RDR] Automation for RDR uninstall</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">keemano</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">368d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Needs Testing</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">needs-rebase</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">DR</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">2</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/13277" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #13277
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/13277" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Discovered apps with exechook configs add to the recipe">Discovered apps with exechook configs add to the recipe</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">Shrivaibavi</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">COMMENTED</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">377d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Test Case</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Verified</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">team/e2e</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">lifecycle/stale</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">needs-rebase</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">5</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/13124" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #13124
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/13124" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Add Support for Mix Workload with Discovered Apps">Add Support for Mix Workload with Discovered Apps</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">prsurve</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">APPROVED</span><div style="font-size:10px;color:#57606a;margin-top:2px">✔ am-agrawa, suchita-g</div></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">394d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Verified</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">lifecycle/stale</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">needs-rebase</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">lgtm</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">DR</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">suchita-g, am-agrawa</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">5</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/12906" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #12906
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/12906" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="[WIP] RDR discovered apps performance test">[WIP] RDR discovered apps performance test</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">pintojoy</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#9a6700">PENDING</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">422d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">lifecycle/stale</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">needs-rebase</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">do-not-merge/work-in-progress</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">pintojoy</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">5</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/12664" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #12664
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/12664" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="[RDR][UI]show_replication_delays">[RDR][UI]show_replication_delays</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">keemano</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#cf222e">CHANGES_REQUESTED</span><div style="font-size:10px;color:#cf222e;margin-top:2px">✘ DanielOsypenko</div></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">449d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Verified</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/L</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">needs-rebase</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">DR</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">Squad/Turquoise</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">DanielOsypenko</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">3</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/12288" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #12288
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/12288" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="[WIP]temporary changes for hci only">[WIP]temporary changes for hci only</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">jilju</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#9a6700">draft</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#9a6700">PENDING</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">496d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">DO NOT MERGE</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/M</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">lifecycle/stale</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">needs-rebase</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">do-not-merge/work-in-progress</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">3</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap">
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/11063" target="_blank" style="font-weight:600;color:#0969da;text-decoration:none">
+                  #11063
+                </a>
+              </td>
+              <td>
+                <a href="https://github.com/red-hat-storage/ocs-ci/pull/11063" target="_blank"
+                   style="color:#24292f;text-decoration:none;font-size:13px"
+                   title="Download subctl downstream unreleased binary">Download subctl downstream unreleased binary</a>
+              </td>
+              <td style="white-space:nowrap;color:#57606a;font-size:12px">shylesh</td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">open</span></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#1a7f37">APPROVED</span><div style="font-size:10px;color:#57606a;margin-top:2px">✔ petr-balogh</div></td>
+              <td><span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;font-weight:600;color:#fff;background:#57606a">skipped</span></td>
+              <td style="white-space:nowrap;font-size:12px">658d</td>
+              <td style="font-size:11px"><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">team/ecosystem</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">size/M</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">lifecycle/stale</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">needs-rebase</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">lgtm</span><span style="display:inline-block;margin:1px 2px;padding:1px 6px;border-radius:10px;font-size:10px;border:1px solid #d0d7de;color:#24292f;background:#f6f8fa">DR</span></td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">shylesh, petr-balogh</td>
+              <td style="font-size:12px;color:#57606a;white-space:nowrap">—</td>
+              <td style="font-size:12px;text-align:right">0</td>
+              <td style="font-size:12px;text-align:right">3</td>
+              <td style="font-size:11px;color:#57606a;white-space:nowrap">—</td>
+            </tr>
+  </tbody>
+</table>
+
+<div class="footer">
+  RDR PR Tracker &nbsp;·&nbsp; red-hat-storage/ocs-ci &nbsp;·&nbsp; 2026-10-08 08:41 UTC
+</div>
+
+<script>
+// ── sort ──────────────────────────────────────────────────────────────────────
+let _sortCol = -1, _sortAsc = true;
+function sortTable(col) {
+  const table = document.getElementById('pr-table');
+  const ths   = table.querySelectorAll('th');
+  const rows  = Array.from(table.tBodies[0].rows);
+  if (_sortCol === col) { _sortAsc = !_sortAsc; }
+  else { _sortCol = col; _sortAsc = true; }
+  ths.forEach((th, i) => { th.classList.remove('asc','desc'); });
+  ths[col].classList.add(_sortAsc ? 'asc' : 'desc');
+  rows.sort((a, b) => {
+    let av = a.cells[col].innerText.trim();
+    let bv = b.cells[col].innerText.trim();
+    // numeric sort for #, Age, 💬, Files columns
+    if ([0,6,10,11].includes(col)) {
+      av = parseFloat(av.replace(/[^0-9.]/g, '')) || 0;
+      bv = parseFloat(bv.replace(/[^0-9.]/g, '')) || 0;
+      return _sortAsc ? av - bv : bv - av;
+    }
+    return _sortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
+  });
+  rows.forEach(r => table.tBodies[0].appendChild(r));
+}
+
+// ── filter ────────────────────────────────────────────────────────────────────
+function filterTable() {
+  const q    = document.getElementById('search').value.toLowerCase();
+  const rows = document.querySelectorAll('#pr-table tbody tr');
+  rows.forEach(row => {
+    row.style.display = row.innerText.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>
