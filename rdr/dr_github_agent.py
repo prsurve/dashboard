@@ -580,17 +580,36 @@ class DRGitHubAgent:
     @staticmethod
     def export_html(prs: List[Dict[str, Any]], path: str = "rdr_prs.html") -> str:
         """
-        Write a self-contained, sortable HTML report to *path* and return the path.
+        Write a self-contained two-tab HTML report to *path* and return the path.
+
+        Tab 1 — PR Table  : sortable, filterable list of all RDR pull requests.
+        Tab 2 — Metrics   : time-to-first-review, time-to-merge, age buckets,
+                            merge velocity (weekly/monthly), longest-open PRs.
 
         The file has zero external dependencies — one file you can open in any
         browser, email, or attach to a Slack message.
         """
         generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+        now_utc = datetime.now(timezone.utc)
 
         # ── helpers ──────────────────────────────────────────────────────────
         def _e(v: Any) -> str:
             """HTML-escape a value."""
             return _html_mod.escape(str(v) if v is not None else "")
+
+        def _parse_dt(iso: str) -> Optional[datetime]:
+            """Parse an ISO-8601 string (Z or +00:00) into an aware datetime."""
+            if not iso:
+                return None
+            try:
+                return datetime.fromisoformat(iso.replace("Z", "+00:00"))
+            except ValueError:
+                return None
+
+        def _hours_between(a: Optional[datetime], b: Optional[datetime]) -> Optional[float]:
+            if a and b:
+                return abs((b - a).total_seconds()) / 3600
+            return None
 
         STATUS_COLOR = {
             "open": "#1a7f37",
@@ -724,20 +743,166 @@ class DRGitHubAgent:
               <td style="font-size:11px;color:#57606a;white-space:nowrap">{_e(pr.get('milestone') or '—')}</td>
             </tr>"""
 
-        # ── full HTML document ────────────────────────────────────────────────
+        # ── metrics computations ──────────────────────────────────────────────
+        merge_times_h: List[float] = []     # hours from open → merge
+        merged_this_week: List[Dict] = []
+        merged_this_month: List[Dict] = []
+        age_buckets = {"<1d": 0, "1–7d": 0, "7–30d": 0, "30–90d": 0, ">90d": 0}
+        longest_open: List[Dict] = []
+
+        week_cutoff  = now_utc.timestamp() - 7 * 86400
+        month_cutoff = now_utc.timestamp() - 30 * 86400
+
+        for pr in prs:
+            created = _parse_dt(pr.get("created_at", ""))
+            merged  = _parse_dt(pr.get("merged_at", ""))
+
+            # merge time
+            mt = _hours_between(created, merged)
+            if mt is not None:
+                merge_times_h.append(mt)
+
+            # merged this week / month
+            if merged:
+                if merged.timestamp() >= week_cutoff:
+                    merged_this_week.append(pr)
+                if merged.timestamp() >= month_cutoff:
+                    merged_this_month.append(pr)
+
+            # age buckets (open PRs only)
+            if pr["status"] in ("open", "draft") and created:
+                age = pr["age_days"]
+                if age < 1:
+                    age_buckets["<1d"] += 1
+                elif age <= 7:
+                    age_buckets["1–7d"] += 1
+                elif age <= 30:
+                    age_buckets["7–30d"] += 1
+                elif age <= 90:
+                    age_buckets["30–90d"] += 1
+                else:
+                    age_buckets[">90d"] += 1
+
+            # longest open
+            if pr["status"] in ("open", "draft"):
+                longest_open.append(pr)
+
+        longest_open.sort(key=lambda p: p["age_days"], reverse=True)
+        longest_open = longest_open[:10]
+
+        def _avg(lst: List[float]) -> str:
+            if not lst:
+                return "n/a"
+            v = sum(lst) / len(lst)
+            if v >= 24:
+                return f"{v/24:.1f}d"
+            return f"{v:.1f}h"
+
+        def _med(lst: List[float]) -> str:
+            if not lst:
+                return "n/a"
+            s = sorted(lst)
+            mid = len(s) // 2
+            v = s[mid] if len(s) % 2 else (s[mid - 1] + s[mid]) / 2
+            if v >= 24:
+                return f"{v/24:.1f}d"
+            return f"{v:.1f}h"
+
+        # ── metrics cards ─────────────────────────────────────────────────────
+        metrics_cards = (
+            _stat_card("Avg Merge Time", _avg(merge_times_h), "#3b82d4")
+            + _stat_card("Median Merge Time", _med(merge_times_h), "#3b82d4")
+            + _stat_card("Merged This Week", len(merged_this_week), "#1a7f37")
+            + _stat_card("Merged This Month", len(merged_this_month), "#1a7f37")
+            + _stat_card("Still Open", sum(age_buckets.values()), "#9a6700")
+        )
+
+        # ── age bar chart data ─────────────────────────────────────────────────
+        age_labels = list(age_buckets.keys())
+        age_values = list(age_buckets.values())
+        age_max    = max(age_values) if any(age_values) else 1
+
+        def _bar(label: str, value: int, max_val: int) -> str:
+            pct = int(value / max_val * 100) if max_val else 0
+            color = "#3b82d4" if pct < 60 else ("#9a6700" if pct < 85 else "#cf222e")
+            return (
+                f'<div style="display:flex;align-items:center;gap:8px;margin:6px 0">'
+                f'<div style="width:70px;font-size:12px;color:#57606a;text-align:right">{_e(label)}</div>'
+                f'<div style="flex:1;background:#eaeef2;border-radius:4px;height:18px">'
+                f'<div style="width:{pct}%;background:{color};height:18px;border-radius:4px"></div></div>'
+                f'<div style="width:28px;font-size:12px;font-weight:600">{value}</div>'
+                f'</div>'
+            )
+
+        age_bars_html = "".join(
+            _bar(label, val, age_max) for label, val in zip(age_labels, age_values)
+        )
+
+        # ── longest open table ─────────────────────────────────────────────────
+        longest_rows = ""
+        for pr in longest_open:
+            longest_rows += (
+                f'<tr>'
+                f'<td><a href="{_e(pr["url"])}" target="_blank" '
+                f'style="color:#0969da;font-weight:600">#{_e(pr["number"])}</a></td>'
+                f'<td style="font-size:12px">'
+                f'<a href="{_e(pr["url"])}" target="_blank" style="color:#24292f">'
+                f'{_e(pr["title"][:70])}{"…" if len(pr["title"])>70 else ""}</a></td>'
+                f'<td style="font-size:12px;color:#57606a">{_e(pr["author"])}</td>'
+                f'<td style="font-weight:700;color:#cf222e;white-space:nowrap">'
+                f'{_e(pr["age_days"])}d</td>'
+                f'<td>{_badge(pr["review_decision"], REVIEW_COLOR.get(pr["review_decision"],"#57606a"))}</td>'
+                f'</tr>'
+            )
+
+        # ── merge velocity table (merged this month) ───────────────────────────
+        velocity_rows = ""
+        for pr in sorted(merged_this_month, key=lambda p: p.get("merged_at") or "", reverse=True):
+            created = _parse_dt(pr.get("created_at", ""))
+            merged  = _parse_dt(pr.get("merged_at", ""))
+            mt      = _hours_between(created, merged)
+            mt_str  = (f"{mt/24:.1f}d" if mt and mt >= 24 else f"{mt:.1f}h") if mt else "—"
+            velocity_rows += (
+                f'<tr>'
+                f'<td><a href="{_e(pr["url"])}" target="_blank" '
+                f'style="color:#0969da;font-weight:600">#{_e(pr["number"])}</a></td>'
+                f'<td style="font-size:12px">'
+                f'<a href="{_e(pr["url"])}" target="_blank" style="color:#24292f">'
+                f'{_e(pr["title"][:65])}{"…" if len(pr["title"])>65 else ""}</a></td>'
+                f'<td style="font-size:12px;color:#57606a">{_e(pr["author"])}</td>'
+                f'<td style="font-size:12px;color:#57606a;white-space:nowrap">'
+                f'{(_e(pr.get("merged_at","")[:10]))}</td>'
+                f'<td style="font-weight:600;color:#1a7f37;white-space:nowrap">{mt_str}</td>'
+                f'</tr>'
+            )
+        if not velocity_rows:
+            velocity_rows = '<tr><td colspan="5" style="color:#57606a;text-align:center;padding:16px">No merged PRs in the last 30 days</td></tr>'
+
+        # ── full HTML document (two tabs) ─────────────────────────────────────
         document = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>RDR Pull Requests — {_e(OWNER_REPO)}</title>
+<title>RDR Dashboard — {_e(OWNER_REPO)}</title>
 <style>
   * {{ box-sizing: border-box; margin: 0; padding: 0; }}
   body {{ font-family: -apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px;
           background:#ffffff; color:#24292f; padding:24px; }}
   h1   {{ font-size:20px; font-weight:700; margin-bottom:4px; }}
+  h2   {{ font-size:15px; font-weight:600; margin:24px 0 10px; color:#24292f; }}
   .sub {{ font-size:12px; color:#57606a; margin-bottom:20px; }}
   .cards {{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px; }}
+  /* ── tabs ── */
+  .tabs     {{ display:flex; gap:0; border-bottom:2px solid #d0d7de; margin-bottom:20px; }}
+  .tab-btn  {{ padding:8px 20px; font-size:13px; font-weight:600; color:#57606a;
+               background:none; border:none; border-bottom:3px solid transparent;
+               cursor:pointer; margin-bottom:-2px; }}
+  .tab-btn:hover  {{ color:#24292f; }}
+  .tab-btn.active {{ color:#0969da; border-bottom-color:#0969da; }}
+  .tab-panel      {{ display:none; }}
+  .tab-panel.active {{ display:block; }}
+  /* ── table ── */
   table {{ width:100%; border-collapse:collapse; font-size:13px; }}
   th    {{ background:#f6f8fa; border:1px solid #d0d7de; padding:8px 10px;
            text-align:left; font-size:12px; font-weight:600; color:#57606a;
@@ -751,43 +916,132 @@ class DRGitHubAgent:
                   border:1px solid #d0d7de; border-radius:6px; font-size:13px; }}
   .footer {{ margin-top:24px; font-size:11px; color:#57606a; text-align:center;
              border-top:1px solid #d0d7de; padding-top:12px; }}
+  .section-box {{ background:#f6f8fa; border:1px solid #d0d7de; border-radius:6px;
+                  padding:16px 20px; margin-bottom:20px; }}
+  .auto-note {{ font-size:11px; color:#57606a; background:#f6f8fa; border:1px solid #d0d7de;
+                border-radius:6px; padding:8px 12px; margin-bottom:16px; display:inline-block; }}
 </style>
 </head>
 <body>
-<h1>🔵 RDR Pull Requests — {_e(OWNER_REPO)}</h1>
-<div class="sub">Generated {_e(generated_at)} &nbsp;·&nbsp; {len(prs)} PR(s) matched</div>
+<h1>🔵 RDR Dashboard — {_e(OWNER_REPO)}</h1>
+<div class="sub">
+  Generated {_e(generated_at)} &nbsp;·&nbsp; {len(prs)} PR(s) matched
+  &nbsp;·&nbsp; <span style="color:#1a7f37">⏰ auto-refreshes daily at 07:00 UTC</span>
+</div>
 
-<div class="cards">{summary_cards}</div>
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('prs',this)">📋 Pull Requests</button>
+  <button class="tab-btn" onclick="showTab('metrics',this)">📊 Metrics</button>
+</div>
 
-<input id="search" type="search" placeholder="Filter by title, author, label…" oninput="filterTable()">
+<!-- ═══════════════════════ TAB 1 : PR TABLE ════════════════════════════════ -->
+<div id="tab-prs" class="tab-panel active">
+  <div class="cards">{summary_cards}</div>
+  <input id="search" type="search" placeholder="Filter by title, author, label…" oninput="filterTable()">
+  <table id="pr-table">
+    <thead>
+      <tr>
+        <th onclick="sortTable(0)">#</th>
+        <th onclick="sortTable(1)">Title</th>
+        <th onclick="sortTable(2)">Author</th>
+        <th onclick="sortTable(3)">Status</th>
+        <th onclick="sortTable(4)">Review</th>
+        <th onclick="sortTable(5)">CI</th>
+        <th onclick="sortTable(6)">Age</th>
+        <th>Labels</th>
+        <th onclick="sortTable(8)">Assignees</th>
+        <th>Req. Reviewers</th>
+        <th onclick="sortTable(10)">💬</th>
+        <th onclick="sortTable(11)">Files</th>
+        <th onclick="sortTable(12)">Milestone</th>
+      </tr>
+    </thead>
+    <tbody>{rows_html}
+    </tbody>
+  </table>
+</div>
 
-<table id="pr-table">
-  <thead>
-    <tr>
-      <th onclick="sortTable(0)">#</th>
-      <th onclick="sortTable(1)">Title</th>
-      <th onclick="sortTable(2)">Author</th>
-      <th onclick="sortTable(3)">Status</th>
-      <th onclick="sortTable(4)">Review</th>
-      <th onclick="sortTable(5)">CI</th>
-      <th onclick="sortTable(6)">Age</th>
-      <th>Labels</th>
-      <th onclick="sortTable(8)">Assignees</th>
-      <th>Req. Reviewers</th>
-      <th onclick="sortTable(10)">💬</th>
-      <th onclick="sortTable(11)">Files</th>
-      <th onclick="sortTable(12)">Milestone</th>
-    </tr>
-  </thead>
-  <tbody>{rows_html}
-  </tbody>
-</table>
+<!-- ═══════════════════════ TAB 2 : METRICS ════════════════════════════════ -->
+<div id="tab-metrics" class="tab-panel">
+
+  <div class="auto-note">
+    ⏰ This page is <strong>auto-generated daily at 07:00 UTC</strong> by GitHub Actions
+    — no manual run needed. Bookmark the URL and share with your team.
+  </div>
+
+  <h2>⏱ Time to Merge</h2>
+  <div class="cards">{metrics_cards}</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+
+    <div class="section-box">
+      <h2 style="margin-top:0">📦 Open PR Age Distribution</h2>
+      <div style="margin-top:8px">{age_bars_html}</div>
+    </div>
+
+    <div class="section-box">
+      <h2 style="margin-top:0">📈 Merge Velocity</h2>
+      <table style="margin-top:8px">
+        <tr>
+          <td style="border:none;padding:6px 8px;font-size:13px">PRs merged <strong>this week</strong></td>
+          <td style="border:none;padding:6px 8px;font-size:18px;font-weight:700;color:#1a7f37">{len(merged_this_week)}</td>
+        </tr>
+        <tr>
+          <td style="border:none;padding:6px 8px;font-size:13px">PRs merged <strong>this month</strong></td>
+          <td style="border:none;padding:6px 8px;font-size:18px;font-weight:700;color:#1a7f37">{len(merged_this_month)}</td>
+        </tr>
+        <tr>
+          <td style="border:none;padding:6px 8px;font-size:13px">Avg time to merge</td>
+          <td style="border:none;padding:6px 8px;font-size:18px;font-weight:700;color:#3b82d4">{_avg(merge_times_h)}</td>
+        </tr>
+        <tr>
+          <td style="border:none;padding:6px 8px;font-size:13px">Median time to merge</td>
+          <td style="border:none;padding:6px 8px;font-size:18px;font-weight:700;color:#3b82d4">{_med(merge_times_h)}</td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+
+  <h2>🐢 Longest Open PRs (top 10)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th><th>Title</th><th>Author</th><th>Age</th><th>Review</th>
+      </tr>
+    </thead>
+    <tbody>{longest_rows if longest_rows else
+      '<tr><td colspan="5" style="color:#57606a;text-align:center;padding:16px">No open PRs</td></tr>'}
+    </tbody>
+  </table>
+
+  <h2>✅ Recently Merged (last 30 days)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th><th>Title</th><th>Author</th><th>Merged</th><th>Time to Merge</th>
+      </tr>
+    </thead>
+    <tbody>{velocity_rows}
+    </tbody>
+  </table>
+
+</div>
 
 <div class="footer">
-  RDR PR Tracker &nbsp;·&nbsp; red-hat-storage/ocs-ci &nbsp;·&nbsp; {_e(generated_at)}
+  RDR Dashboard &nbsp;·&nbsp; {_e(OWNER_REPO)} &nbsp;·&nbsp; {_e(generated_at)}
+  &nbsp;·&nbsp; auto-refreshes daily at 07:00 UTC
 </div>
 
 <script>
+// ── tabs ──────────────────────────────────────────────────────────────────────
+function showTab(id, btn) {{
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}}
+
 // ── sort ──────────────────────────────────────────────────────────────────────
 let _sortCol = -1, _sortAsc = true;
 function sortTable(col) {{
@@ -801,7 +1055,6 @@ function sortTable(col) {{
   rows.sort((a, b) => {{
     let av = a.cells[col].innerText.trim();
     let bv = b.cells[col].innerText.trim();
-    // numeric sort for #, Age, 💬, Files columns
     if ([0,6,10,11].includes(col)) {{
       av = parseFloat(av.replace(/[^0-9.]/g, '')) || 0;
       bv = parseFloat(bv.replace(/[^0-9.]/g, '')) || 0;
