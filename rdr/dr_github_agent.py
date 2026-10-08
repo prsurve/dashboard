@@ -1089,16 +1089,51 @@ function showTab(id, btn) {{
   btn.classList.add('active');
 }}
 
-// ── active filter state ───────────────────────────────────────────────────────
-// Tracks what the card buttons have selected so text search can combine with it.
-let _activeFilter = 'open';   // default: show only open PRs on load
+// ── multi-select filter state ─────────────────────────────────────────────────
+// Three independent sets — selecting within a set is OR, across sets is AND.
+// e.g. (open OR draft) AND (APPROVED) shows open+draft approved PRs.
+// "all" is a special reset — clears every other selection.
+const _sel = {{ status: new Set(), review: new Set(), ci: new Set() }};
 
-// ── card filter ───────────────────────────────────────────────────────────────
+function _dim(val) {{
+  if (val === 'all')           return 'reset';
+  if (val.startsWith('review:')) return 'review';
+  if (val.startsWith('ci:'))    return 'ci';
+  return 'status';
+}}
+function _raw(val) {{
+  if (val.startsWith('review:')) return val.slice(7);
+  if (val.startsWith('ci:'))    return val.slice(3);
+  return val;
+}}
+
+// ── card toggle ───────────────────────────────────────────────────────────────
 function filterByStatus(val, cardEl) {{
-  _activeFilter = val;
-  // highlight the clicked card
-  document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
-  if (cardEl) cardEl.classList.add('active');
+  if (val === 'all') {{
+    // "Total PRs" resets everything → show all
+    _sel.status.clear(); _sel.review.clear(); _sel.ci.clear();
+    document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+    cardEl.classList.add('active');
+  }} else {{
+    // Deactivate "Total PRs" since we now have a specific selection
+    const allCard = document.querySelector('.stat-card[data-filter="all"]');
+    if (allCard) allCard.classList.remove('active');
+
+    const dim = _dim(val);
+    const raw = _raw(val);
+    if (_sel[dim].has(raw)) {{
+      _sel[dim].delete(raw);
+      cardEl.classList.remove('active');
+    }} else {{
+      _sel[dim].add(raw);
+      cardEl.classList.add('active');
+    }}
+
+    // If all sets are empty after a deselect, go back to "all"
+    if (!_sel.status.size && !_sel.review.size && !_sel.ci.size) {{
+      if (allCard) allCard.classList.add('active');
+    }}
+  }}
   _applyFilters();
 }}
 
@@ -1109,28 +1144,23 @@ function filterTable() {{
 
 // ── combined filter engine ────────────────────────────────────────────────────
 function _applyFilters() {{
-  const q = document.getElementById('search').value.toLowerCase();
+  const q        = document.getElementById('search').value.toLowerCase();
+  const noStatus = _sel.status.size === 0;
+  const noReview = _sel.review.size === 0;
+  const noCi     = _sel.ci.size === 0;
+  const allCards = noStatus && noReview && noCi;
+
   document.querySelectorAll('#pr-table tbody tr').forEach(row => {{
     const status = row.dataset.status || '';
     const review = row.dataset.review || '';
     const ci     = row.dataset.ci     || '';
 
-    // card filter
-    let cardMatch = true;
-    if (_activeFilter === 'all') {{
-      cardMatch = true;
-    }} else if (_activeFilter.startsWith('review:')) {{
-      cardMatch = review === _activeFilter.slice(7);
-    }} else if (_activeFilter.startsWith('ci:')) {{
-      cardMatch = ci === _activeFilter.slice(3);
-    }} else {{
-      cardMatch = status === _activeFilter;
-    }}
+    const statusOk = noStatus || _sel.status.has(status);
+    const reviewOk = noReview || _sel.review.has(review);
+    const ciOk     = noCi     || _sel.ci.has(ci);
+    const textOk   = !q || row.innerText.toLowerCase().includes(q);
 
-    // text filter
-    const textMatch = !q || row.innerText.toLowerCase().includes(q);
-
-    row.style.display = (cardMatch && textMatch) ? '' : 'none';
+    row.style.display = (statusOk && reviewOk && ciOk && textOk) ? '' : 'none';
   }});
 }}
 
@@ -1157,16 +1187,17 @@ function sortTable(col) {{
   rows.forEach(r => table.tBodies[0].appendChild(r));
 }}
 
-// ── init: activate the Open card on load ─────────────────────────────────────
+// ── init: select Open by default, fall back to all ───────────────────────────
 document.addEventListener('DOMContentLoaded', function() {{
   const openCard = document.querySelector('.stat-card[data-filter="open"]');
-  if (openCard) {{ openCard.classList.add('active'); }}
-  else {{
-    // no open PRs — fall back to showing all
-    _activeFilter = 'all';
+  if (openCard) {{
+    openCard.classList.add('active');
+    _sel.status.add('open');
+    _applyFilters();
+  }} else {{
+    // no open PRs — activate Total PRs (show everything)
     const allCard = document.querySelector('.stat-card[data-filter="all"]');
     if (allCard) allCard.classList.add('active');
-    _applyFilters();
   }}
 }});
 </script>
