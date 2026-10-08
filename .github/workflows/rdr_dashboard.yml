@@ -11,9 +11,9 @@ on:
       state:
         description: "PR state to include"
         required: false
-        default: "open"
+        default: "all"
         type: choice
-        options: [open, all, closed]
+        options: [all, open, closed]
 
 permissions:
   contents: write
@@ -47,7 +47,7 @@ jobs:
         run: |
           python rdr/dr_github_agent.py \
             --repo red-hat-storage/ocs-ci \
-            --state ${{ github.event.inputs.state || 'open' }} \
+            --state ${{ github.event.inputs.state || 'all' }} \
             --no-checks \
             --html /tmp/index.html
           echo "Report generated."
