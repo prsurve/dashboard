@@ -176,6 +176,53 @@ def _resolve_client() -> Client:
     sys.exit(2)
 
 
+def _issue_parent(key: str, client: Client) -> Tuple[Optional[str], Optional[str]]:
+    """Return (parent_key, parent_summary) for an issue, or (None, None)."""
+    try:
+        r = requests.get(
+            f"{client.base}/issue/{key}",
+            headers=client.headers,
+            auth=client.auth,
+            params={"fields": "parent,summary"},
+            timeout=30,
+        )
+        if r.ok:
+            p = (r.json().get("fields", {}) or {}).get("parent") or {}
+            return p.get("key"), (p.get("fields") or {}).get("summary")
+    except Exception as exc:
+        logger.debug(f"parent lookup for {key} failed: {exc}")
+    return None, None
+
+
+def _resolve_features(features: List[Dict[str, Any]], client: Client) -> None:
+    """
+    Stamp each feature with its top-level RHSTOR feature epic (feature_key/
+    feature_summary), resolving through an intermediate OCSQE epic when present:
+      • story parent is RHSTOR-*  → that is the feature
+      • story parent is OCSQE-*   → look up that epic's parent; use it if RHSTOR-*
+    OCSQE epic lookups are cached so each distinct epic is fetched at most once.
+    """
+    cache: Dict[str, Tuple[Optional[str], Optional[str]]] = {}
+
+    def feature_of(pkey: Optional[str], psummary: Optional[str]):
+        if not pkey:
+            return None, None
+        if pkey.startswith("RHSTOR"):
+            return pkey, psummary
+        if pkey in cache:
+            return cache[pkey]
+        gk, gs = _issue_parent(pkey, client)           # OCSQE epic → its parent
+        res = (gk, gs) if (gk and gk.startswith("RHSTOR")) else (None, None)
+        cache[pkey] = res
+        return res
+
+    for f in features:
+        fk, fs = feature_of(f.get("parent_key"), f.get("parent_summary"))
+        f["feature_key"] = fk
+        f["feature_summary"] = fs
+    logger.info(f"Resolved RHSTOR features via {len(cache)} OCSQE-epic lookup(s).")
+
+
 def _search(jql: str, client: Client, fields: List[str]) -> List[Dict[str, Any]]:
     """
     Run a JQL search against the Cloud v3 ``/search/jql`` endpoint and return all
@@ -294,6 +341,7 @@ class JiraDRAgent:
         bugs = [_normalize(i) for i in _search(self.bugs_jql, self.client, FIELDS)]
         logger.info(f"Fetching features … [{self.features_jql}]")
         features = [_normalize(i) for i in _search(self.features_jql, self.client, FIELDS)]
+        _resolve_features(features, self.client)
         logger.info(f"Done: {len(bugs)} bugs, {len(features)} features.")
         return bugs, features
 
