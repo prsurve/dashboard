@@ -265,6 +265,7 @@ class JiraDRAgent:
         self.features_jql = features_jql
 
     def fetch(self) -> Tuple[List[Dict], List[Dict]]:
+        _whoami(self.auth)
         logger.info(f"Fetching bugs … [{self.bugs_jql}]")
         bugs = [_normalize(i) for i in _search(self.bugs_jql, self.auth, FIELDS)]
         logger.info(f"Fetching features … [{self.features_jql}]")
