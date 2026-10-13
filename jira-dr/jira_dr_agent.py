@@ -43,7 +43,12 @@ logger = logging.getLogger(__name__)
 # ── Config ─────────────────────────────────────────────────────────────────────
 
 SITE = "https://redhat.atlassian.net"
-API_BASE = f"{SITE}/rest/api/3"
+CLOUD_ID = "2b9e35e3-6bd3-4cec-b838-f4249ee02432"
+SITE_API = f"{SITE}/rest/api/3"
+CLOUD_API = f"https://api.atlassian.com/ex/jira/{CLOUD_ID}/rest/api/3"
+# API_BASE is used for building issue browse URLs only; the live client base is
+# resolved at runtime (basic vs bearer) — see _resolve_client().
+API_BASE = SITE_API
 
 PROJECTS = ["DFBUGS", "OCSQE"]
 
@@ -115,50 +120,68 @@ PAGE_SIZE = 100
 # ── Auth / HTTP ─────────────────────────────────────────────────────────────────
 
 
-def _resolve_auth() -> Tuple[str, str]:
-    """Return (email, api_token) from the environment or exit with guidance."""
+class Client:
+    """A resolved, authenticated Jira client (base URL + auth scheme)."""
+
+    def __init__(self, name: str, base: str, headers: Dict[str, str], auth):
+        self.name = name
+        self.base = base
+        self.headers = {"Accept": "application/json", **headers}
+        self.auth = auth
+
+
+def _resolve_client() -> Client:
+    """
+    Resolve a working Jira client by probing /myself with several auth schemes:
+      1. Basic auth (email + token) against the site  — classic API tokens
+      2. Bearer token against api.atlassian.com/ex/jira — scoped API tokens
+      3. Bearer token against the site                 — fallback
+    Returns the first scheme that authenticates (HTTP 200), else exits.
+    """
     email = os.environ.get("JIRA_EMAIL", "").strip()
     token = os.environ.get("JIRA_API_TOKEN", "").strip()
-    if not email or not token:
+    if not token:
         logger.error(
-            "Missing Jira credentials. Set JIRA_EMAIL and JIRA_API_TOKEN "
-            "(create a token at "
-            "https://id.atlassian.com/manage-profile/security/api-tokens)."
+            "Missing JIRA_API_TOKEN. Create a token at "
+            "https://id.atlassian.com/manage-profile/security/api-tokens "
+            "and set JIRA_API_TOKEN (+ JIRA_EMAIL for a classic token)."
         )
         sys.exit(2)
-    return email, token
 
+    candidates = []
+    if email:
+        candidates.append(Client("basic-site", SITE_API, {}, (email, token)))
+    candidates.append(Client("bearer-cloud", CLOUD_API, {"Authorization": f"Bearer {token}"}, None))
+    candidates.append(Client("bearer-site", SITE_API, {"Authorization": f"Bearer {token}"}, None))
 
-def _whoami(auth: Tuple[str, str]) -> None:
-    """Log which account the token authenticates as (diagnostic)."""
-    try:
-        r = requests.get(
-            f"{API_BASE}/myself",
-            headers={"Accept": "application/json"},
-            auth=auth,
-            timeout=30,
-        )
+    for c in candidates:
+        try:
+            r = requests.get(f"{c.base}/myself", headers=c.headers, auth=c.auth, timeout=30)
+        except Exception as exc:
+            logger.warning(f"auth probe {c.name} failed: {exc}")
+            continue
         if r.status_code == 200:
             me = r.json()
             logger.info(
-                f"Authenticated as {me.get('displayName')} "
+                f"Authenticated via {c.name} as {me.get('displayName')} "
                 f"<{me.get('emailAddress')}> (accountId {me.get('accountId')})"
             )
-        else:
-            logger.warning(f"/myself returned HTTP {r.status_code}: {r.text[:200]}")
-    except Exception as exc:
-        logger.warning(f"/myself check failed: {exc}")
+            return c
+        logger.warning(f"auth probe {c.name} -> HTTP {r.status_code}: {r.text[:120]}")
+
+    logger.error(
+        "Could not authenticate to Jira with any scheme. Check that JIRA_API_TOKEN "
+        "is valid and (for a classic token) JIRA_EMAIL matches the token's account."
+    )
+    sys.exit(2)
 
 
-def _search(
-    jql: str, auth: Tuple[str, str], fields: List[str]
-) -> List[Dict[str, Any]]:
+def _search(jql: str, client: Client, fields: List[str]) -> List[Dict[str, Any]]:
     """
     Run a JQL search against the Cloud v3 ``/search/jql`` endpoint and return all
     raw issue dicts, following ``nextPageToken`` pagination until ``isLast``.
     """
-    url = f"{API_BASE}/search/jql"
-    headers = {"Accept": "application/json"}
+    url = f"{client.base}/search/jql"
     issues: List[Dict[str, Any]] = []
     next_token: Optional[str] = None
     page = 0
@@ -172,9 +195,11 @@ def _search(
         if next_token:
             params["nextPageToken"] = next_token
 
-        resp = requests.get(url, headers=headers, params=params, auth=auth, timeout=60)
+        resp = requests.get(
+            url, headers=client.headers, params=params, auth=client.auth, timeout=60
+        )
         if resp.status_code == 401:
-            raise RuntimeError("Jira auth failed (401). Check JIRA_EMAIL / JIRA_API_TOKEN.")
+            raise RuntimeError("Jira auth failed (401) mid-run.")
         if resp.status_code == 400:
             raise RuntimeError(f"Jira rejected the JQL (400): {resp.text[:300]}")
         resp.raise_for_status()
@@ -260,16 +285,15 @@ def _normalize(issue: Dict[str, Any]) -> Dict[str, Any]:
 
 class JiraDRAgent:
     def __init__(self, bugs_jql: str = BUGS_JQL, features_jql: str = FEATURES_JQL):
-        self.auth = _resolve_auth()
+        self.client = _resolve_client()
         self.bugs_jql = bugs_jql
         self.features_jql = features_jql
 
     def fetch(self) -> Tuple[List[Dict], List[Dict]]:
-        _whoami(self.auth)
         logger.info(f"Fetching bugs … [{self.bugs_jql}]")
-        bugs = [_normalize(i) for i in _search(self.bugs_jql, self.auth, FIELDS)]
+        bugs = [_normalize(i) for i in _search(self.bugs_jql, self.client, FIELDS)]
         logger.info(f"Fetching features … [{self.features_jql}]")
-        features = [_normalize(i) for i in _search(self.features_jql, self.auth, FIELDS)]
+        features = [_normalize(i) for i in _search(self.features_jql, self.client, FIELDS)]
         logger.info(f"Done: {len(bugs)} bugs, {len(features)} features.")
         return bugs, features
 
