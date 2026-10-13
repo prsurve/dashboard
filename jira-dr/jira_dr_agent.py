@@ -45,23 +45,49 @@ logger = logging.getLogger(__name__)
 SITE = "https://redhat.atlassian.net"
 API_BASE = f"{SITE}/rest/api/3"
 
-PROJECTS = ["OCSQE", "RHSTOR"]
+PROJECTS = ["DFBUGS", "OCSQE"]
 
-# Versions pre-selected as chips in the dashboard. The shell still lists EVERY
-# version found in the data — this just decides which are highlighted by default.
-# Moving to the next release pair is a one-line edit here (no code change).
-ACTIVE_VERSIONS = ["ODF v5.1.0", "ODF v5.0.0"]
+# The two releases the team is working on. fixVersion is named differently per
+# project — DFBUGS uses "odf-5.0", OCSQE uses "ODF v5.0.0" — so we keep both
+# conventions here and the dashboard normalizes them to "5.0" / "5.1" chips.
+# Moving to the next release pair is a one-line edit of these three lists.
+BUG_VERSIONS = ["odf-5.0", "odf-5.1"]            # DFBUGS fixVersion names
+FEATURE_VERSIONS = ["ODF v5.0.0", "ODF v5.1.0"]  # OCSQE fixVersion names
+ACTIVE_VERSIONS = ["5.1", "5.0"]                 # normalized chip keys, pre-selected
 
-# Default JQL. The team can swap these for their exact filters via the CLI flags
-# or by editing these constants. Keep the two issue-type splits (bug vs feature).
-BUGS_JQL = (
-    'project IN (OCSQE, RHSTOR) AND labels = "odf-qe-dr" '
-    "AND issuetype = Bug ORDER BY updated DESC"
-)
-FEATURES_JQL = (
-    'project IN (OCSQE, RHSTOR) AND labels = "odf-qe-dr" '
-    "AND issuetype IN (Epic, Story) ORDER BY updated DESC"
-)
+# DR team QA contacts (account IDs). DR bugs in DFBUGS carry no special label —
+# they're identified by the QA contact being one of the DR team.
+DR_QA_CONTACTS = [
+    "70121:d3633ed2-b0cb-46b4-beea-7dbba32cfa0d",
+    "70121:afabdfc0-9365-4e43-9634-0cd82e361085",
+    "712020:271d797f-9183-4e71-8e4f-731fd0ffa60c",
+    "712020:96fbb3ba-17c0-44d3-8ec0-635b343d46c3",
+    "61d6d7bace3652006ad56263",
+    "70121:0947089f-dfc8-4fb6-b91f-42e5919144cb",
+]
+
+QA_FIELD = '"QA Contact[User Picker (single user)]"'
+
+
+def _bugs_jql() -> str:
+    vers = ", ".join(f'"{v}"' for v in BUG_VERSIONS)
+    qa = " OR ".join(f"{QA_FIELD} = {aid}" for aid in DR_QA_CONTACTS)
+    return (
+        f'project = "DFBUGS" AND status = ON_QA AND fixVersion in ({vers}) '
+        f"AND ({qa}) ORDER BY updated DESC"
+    )
+
+
+def _features_jql() -> str:
+    vers = ", ".join(f'"{v}"' for v in FEATURE_VERSIONS)
+    return (
+        f"project = OCSQE AND type = Story AND fixVersion in ({vers}) "
+        f"AND labels = odf-qe-dr ORDER BY created DESC"
+    )
+
+
+BUGS_JQL = _bugs_jql()
+FEATURES_JQL = _features_jql()
 
 # Fields requested from Jira. Explicit list keeps the payload small and stable.
 FIELDS = [
@@ -101,6 +127,27 @@ def _resolve_auth() -> Tuple[str, str]:
         )
         sys.exit(2)
     return email, token
+
+
+def _whoami(auth: Tuple[str, str]) -> None:
+    """Log which account the token authenticates as (diagnostic)."""
+    try:
+        r = requests.get(
+            f"{API_BASE}/myself",
+            headers={"Accept": "application/json"},
+            auth=auth,
+            timeout=30,
+        )
+        if r.status_code == 200:
+            me = r.json()
+            logger.info(
+                f"Authenticated as {me.get('displayName')} "
+                f"<{me.get('emailAddress')}> (accountId {me.get('accountId')})"
+            )
+        else:
+            logger.warning(f"/myself returned HTTP {r.status_code}: {r.text[:200]}")
+    except Exception as exc:
+        logger.warning(f"/myself check failed: {exc}")
 
 
 def _search(
