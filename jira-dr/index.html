@@ -30,6 +30,31 @@
   .chip:hover { border-color:#8250df; background:#faf5ff; }
   .chip.active { border-color:#8250df; background:#8250df; color:#fff; box-shadow:0 0 0 2px rgba(130,80,223,.25); }
   .chip .cnt { opacity:.75; font-weight:500; margin-left:4px; }
+  /* ── facet filter bar ── */
+  .facets { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; align-items:center; }
+  .facets-label { font-size:12px; color:#57606a; margin-right:2px; }
+  .facet { position:relative; }
+  .facet-btn {
+    cursor:pointer; padding:5px 12px; border:1.5px solid #d0d7de; border-radius:6px; background:#fff;
+    font-size:12px; font-weight:600; color:#24292f; user-select:none;
+  }
+  .facet-btn:hover { border-color:#3b82d4; background:#f3f8ff; }
+  .facet-btn.has-sel { border-color:#0969da; background:#dbeafe; }
+  .facet-btn .fcnt { color:#0969da; }
+  .facet-menu {
+    display:none; position:absolute; z-index:20; top:calc(100% + 4px); left:0; min-width:220px;
+    max-height:320px; overflow:auto; background:#fff; border:1px solid #d0d7de; border-radius:8px;
+    box-shadow:0 6px 24px rgba(27,31,36,.18); padding:6px;
+  }
+  .facet-menu.open { display:block; }
+  .facet-opt { display:flex; align-items:center; gap:8px; padding:4px 8px; border-radius:6px; font-size:12px; cursor:pointer; }
+  .facet-opt:hover { background:#f6f8fa; }
+  .facet-opt .ocnt { margin-left:auto; color:#8c959f; font-size:11px; }
+  .facet-clear {
+    cursor:pointer; padding:5px 12px; border:1.5px solid transparent; border-radius:6px; background:none;
+    font-size:12px; font-weight:600; color:#cf222e; user-select:none;
+  }
+  .facet-clear:hover { background:#ffebe9; }
   /* ── tabs ── */
   .tabs     { display:flex; gap:0; border-bottom:2px solid #d0d7de; margin-bottom:18px; }
   .tab-btn  { padding:8px 20px; font-size:13px; font-weight:600; color:#57606a; background:none;
@@ -77,6 +102,9 @@
 
 <!-- version chips apply across every tab -->
 <div class="chips" id="chips"><span class="chips-label">Versions:</span></div>
+
+<!-- user-defined facet filters apply across every tab -->
+<div class="facets" id="facets"><span class="facets-label">Filters:</span></div>
 
 <div class="tabs">
   <button class="tab-btn active" onclick="showTab('bugs',this)">🐞 Bugs</button>
@@ -254,6 +282,89 @@ function matchesVersion(issue){
   return (issue.versions||[]).some(v => _verSel.has(v));
 }
 
+// ── user-defined facet filters (apply across all tabs) ──────────────────────────
+// Each facet pulls one or more values from an issue; selecting within a facet is OR,
+// across facets is AND. All client-side over the loaded data; saved in the URL.
+const FACETS = [
+  { key:'project',   label:'Project',   urlp:'pj', get:i => [ (i.key||'').split('-')[0] || '(none)' ] },
+  { key:'assignee',  label:'Assignee',  urlp:'as', get:i => [ i.assignee || '(unassigned)' ] },
+  { key:'priority',  label:'Priority',  urlp:'pr', get:i => [ i.priority || '(none)' ] },
+  { key:'component', label:'Component', urlp:'cp', get:i => (i.components && i.components.length ? i.components : ['(none)']) },
+  { key:'label',     label:'Label',     urlp:'lb', get:i => (i.labels && i.labels.length ? i.labels : ['(none)']) },
+];
+const _facetSel = {};
+FACETS.forEach(f => _facetSel[f.key] = new Set());
+
+function matchesFacets(issue){
+  for (const f of FACETS){
+    const sel = _facetSel[f.key];
+    if (!sel.size) continue;
+    if (!f.get(issue).some(v => sel.has(v))) return false;
+  }
+  return true;
+}
+// combined global predicate: version chips AND facet filters
+function passesGlobal(issue){ return matchesVersion(issue) && matchesFacets(issue); }
+
+function _allIssues(){ return [ ...(DATA.bugs||[]), ...(DATA.features||[]) ]; }
+function facetValueCounts(f){
+  const m = {};
+  _allIssues().forEach(i => f.get(i).forEach(v => { m[v] = (m[v]||0) + 1; }));
+  return m;
+}
+function renderFacets(){
+  let html = '<span class="facets-label">Filters:</span>';
+  FACETS.forEach(f => {
+    const sel = _facetSel[f.key];
+    const cnt = sel.size ? ' <span class="fcnt">(' + sel.size + ')</span>' : '';
+    const counts = facetValueCounts(f);
+    const opts = Object.entries(counts).sort((a,b) => b[1]-a[1]).map(([val, n]) => {
+      const checked = sel.has(val) ? ' checked' : '';
+      const safe = val.replace(/"/g, '&quot;');
+      return '<label class="facet-opt"><input type="checkbox"' + checked
+           + ' onchange="onFacetToggle(\'' + f.key + '\', this.value, this.checked)" value="'
+           + safe + '">' + esc(val) + '<span class="ocnt">' + n + '</span></label>';
+    }).join("");
+    html += '<div class="facet">'
+      + '<button class="facet-btn' + (sel.size ? ' has-sel' : '') + '" onclick="toggleFacetMenu(event,\'' + f.key + '\')">'
+      + esc(f.label) + cnt + ' ▾</button>'
+      + '<div class="facet-menu" id="facet-menu-' + f.key + '">' + (opts || '<div style="padding:6px;color:#8c959f;font-size:12px">No values</div>') + '</div>'
+      + '</div>';
+  });
+  html += '<button class="facet-clear" onclick="clearAllFilters()">✕ Clear all</button>';
+  document.getElementById('facets').innerHTML = html;
+}
+function toggleFacetMenu(ev, key){
+  ev.stopPropagation();
+  const menu = document.getElementById('facet-menu-' + key);
+  const wasOpen = menu.classList.contains('open');
+  document.querySelectorAll('.facet-menu').forEach(m => m.classList.remove('open'));
+  if (!wasOpen) menu.classList.add('open');
+}
+function onFacetToggle(key, value, checked){
+  const sel = _facetSel[key];
+  if (checked) sel.add(value); else sel.delete(value);
+  // update the button badge/highlight in place (keep the menu open)
+  const btn = document.querySelector('#facet-menu-' + key).previousElementSibling;
+  const f = FACETS.find(x => x.key === key);
+  btn.classList.toggle('has-sel', sel.size > 0);
+  btn.innerHTML = esc(f.label) + (sel.size ? ' <span class="fcnt">(' + sel.size + ')</span>' : '') + ' ▾';
+  rerenderAll();
+  _syncUrl();
+}
+function clearAllFilters(){
+  _verSel.clear();
+  FACETS.forEach(f => _facetSel[f.key].clear());
+  _statusSel.bugs.clear(); _statusSel.features.clear();
+  document.querySelector('#tab-bugs .search').value = '';
+  document.querySelector('#tab-features .search').value = '';
+  renderChips(); renderFacets(); rerenderAll(); _syncUrl();
+}
+// close any open facet menu when clicking elsewhere
+document.addEventListener('click', e => {
+  if (!e.target.closest('.facet')) document.querySelectorAll('.facet-menu').forEach(m => m.classList.remove('open'));
+});
+
 // ── stat cards (per tab, by status category) ────────────────────────────────────
 function statCard(label, value, color, catVal, tab){
   const cv = catVal || "all";
@@ -279,7 +390,7 @@ function highlightCards(tab){
   });
 }
 function renderCards(tab, items){
-  const vis = items.filter(matchesVersion);
+  const vis = items.filter(passesGlobal);
   const byCat = {};
   vis.forEach(i => { byCat[i.status_category] = (byCat[i.status_category]||0) + 1; });
   let html = statCard("Total", vis.length, "#3b82d4", "all", tab);
@@ -304,7 +415,7 @@ function summaryCell(issue){
   return html;
 }
 function renderBugs(items){
-  const rows = items.filter(matchesVersion).map(i =>
+  const rows = items.filter(passesGlobal).map(i =>
     '<tr data-cat="' + esc(i.status_category) + '">'
     + '<td style="white-space:nowrap">' + keyLink(i) + '</td>'
     + '<td style="font-size:12px">' + summaryCell(i) + '</td>'
@@ -321,7 +432,7 @@ function renderBugs(items){
     '<tr><td colspan="9" style="color:#57606a;text-align:center;padding:16px">No bugs match the current filters</td></tr>';
 }
 function renderFeatures(items){
-  const rows = items.filter(matchesVersion).map(i =>
+  const rows = items.filter(passesGlobal).map(i =>
     '<tr data-cat="' + esc(i.status_category) + '">'
     + '<td style="white-space:nowrap">' + keyLink(i) + '</td>'
     + '<td style="font-size:12px">' + summaryCell(i) + '</td>'
@@ -366,8 +477,8 @@ function countRows(map, colorFn){
   }).join("");
 }
 function renderOverview(){
-  const bugs = (DATA.bugs||[]).filter(matchesVersion);
-  const feats = (DATA.features||[]).filter(matchesVersion);
+  const bugs = (DATA.bugs||[]).filter(passesGlobal);
+  const feats = (DATA.features||[]).filter(passesGlobal);
   const byStatus = items => { const m={}; items.forEach(i => { const k=CAT_LABEL[i.status_category]||"Unknown"; m[k]=(m[k]||0)+1; }); return m; };
   const byVersion = items => { const m={}; items.forEach(i => { (i.versions.length?i.versions:["(none)"]).forEach(v => m[v]=(m[v]||0)+1); }); return m; };
   const statusColor = lbl => ({ "To Do":"#57606a","In Progress":"#9a6700","Done":"#1a7f37" }[lbl] || "#3b82d4");
@@ -410,6 +521,7 @@ function sortFeatures(col){
 function _syncUrl(){
   const p = new URLSearchParams();
   if (_verSel.size) p.set('ver', [..._verSel].join('|'));
+  FACETS.forEach(f => { if (_facetSel[f.key].size) p.set(f.urlp, [..._facetSel[f.key]].join('|')); });
   if (_statusSel.bugs.size) p.set('bstatus', [..._statusSel.bugs].join(','));
   if (_statusSel.features.size) p.set('fstatus', [..._statusSel.features].join(','));
   const bq = document.querySelector('#tab-bugs .search').value.trim();
@@ -424,6 +536,7 @@ function _applyUrlState(){
   const p = new URLSearchParams(location.search);
   const ver = p.get('ver');
   if (ver) ver.split('|').filter(Boolean).forEach(v => _verSel.add(v));
+  FACETS.forEach(f => { const v = p.get(f.urlp); if (v) v.split('|').filter(Boolean).forEach(x => _facetSel[f.key].add(x)); });
   const bs = p.get('bstatus'); if (bs) bs.split(',').filter(Boolean).forEach(s => _statusSel.bugs.add(s));
   const fs = p.get('fstatus'); if (fs) fs.split(',').filter(Boolean).forEach(s => _statusSel.features.add(s));
   const bq = p.get('bq'); if (bq) document.querySelector('#tab-bugs .search').value = bq;
@@ -489,6 +602,7 @@ function render(payload){
   }
 
   renderChips();
+  renderFacets();
   rerenderAll();
 
   if (gen && (Date.now() - gen.getTime() > STALE_MS)) setLive('stale', 'data may be stale');
