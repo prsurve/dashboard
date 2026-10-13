@@ -288,6 +288,7 @@ function matchesVersion(issue){
 const FACETS = [
   { key:'project',   label:'Project',   urlp:'pj', get:i => [ (i.key||'').split('-')[0] || '(none)' ] },
   { key:'assignee',  label:'Assignee',  urlp:'as', get:i => [ i.assignee || '(unassigned)' ] },
+  { key:'qa_contact',label:'QA Contact', urlp:'qa', get:i => [ i.qa_contact || '(none)' ] },
   { key:'priority',  label:'Priority',  urlp:'pr', get:i => [ i.priority || '(none)' ] },
   { key:'component', label:'Component', urlp:'cp', get:i => (i.components && i.components.length ? i.components : ['(none)']) },
   { key:'label',     label:'Label',     urlp:'lb', get:i => (i.labels && i.labels.length ? i.labels : ['(none)']) },
