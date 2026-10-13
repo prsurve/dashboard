@@ -178,6 +178,10 @@
       <table style="margin-top:8px"><tbody id="ov-feat-version"></tbody></table>
     </div>
   </div>
+  <div class="section-box">
+    <h2 style="margin-top:0">🎯 Features by RHSTOR epic</h2>
+    <table style="margin-top:8px"><tbody id="ov-feature-epic"></tbody></table>
+  </div>
 </div>
 
 <div class="footer">
@@ -410,12 +414,29 @@ function keyLink(issue){
   return '<a href="' + esc(issue.url) + '" target="_blank" style="color:#0969da;font-weight:600;text-decoration:none">'
        + esc(issue.key) + '</a>';
 }
+// Epic/feature reference badge. RHSTOR = top-level feature (purple 🎯),
+// anything else (e.g. an OCSQE QE epic) = grey ↳.
+function epicBadge(key, summary){
+  const isFeature = /^RHSTOR/.test(key);
+  const st = isFeature
+    ? 'border:1px solid #d9c7f5;color:#6639b7;background:#f6efff'
+    : 'border:1px solid #d0d7de;color:#57606a;background:#f6f8fa';
+  const icon = isFeature ? '🎯 ' : '↳ ';
+  const url = (DATA && DATA.site ? DATA.site : '') + '/browse/' + key;
+  let h = '<a href="' + esc(url) + '" target="_blank" style="text-decoration:none">'
+        + '<span style="display:inline-block;padding:0 6px;border-radius:9px;font-size:10px;font-weight:600;' + st + '">'
+        + icon + esc(key) + '</span></a>';
+  if (summary) h += '<span style="font-size:10px;color:#8c959f"> ' + esc(summary.slice(0,45)) + '</span>';
+  return h;
+}
 function summaryCell(issue){
   let html = '<a href="' + esc(issue.url) + '" target="_blank" style="color:#24292f;text-decoration:none" title="' + esc(issue.summary) + '">'
            + esc(issue.summary) + '</a>';
-  if (issue.parent_key)
-    html += '<div style="font-size:10px;color:#8c959f;margin-top:2px">↳ ' + esc(issue.parent_key)
-          + (issue.parent_summary ? ' · ' + esc(issue.parent_summary.slice(0,50)) : '') + '</div>';
+  const refs = [];
+  if (issue.feature_key) refs.push([issue.feature_key, issue.feature_summary]);
+  if (issue.parent_key && issue.parent_key !== issue.feature_key) refs.push([issue.parent_key, issue.parent_summary]);
+  if (refs.length)
+    html += '<div style="margin-top:3px">' + refs.map(r => epicBadge(r[0], r[1])).join(' ') + '</div>';
   return html;
 }
 function renderBugs(items){
@@ -490,6 +511,13 @@ function renderOverview(){
   document.getElementById('ov-feat-status').innerHTML = countRows(byStatus(feats), statusColor);
   document.getElementById('ov-bug-version').innerHTML  = countRows(byVersion(bugs), () => "#8250df");
   document.getElementById('ov-feat-version').innerHTML = countRows(byVersion(feats), () => "#8250df");
+  // features grouped by their top-level RHSTOR feature epic
+  const byFeature = {};
+  feats.forEach(i => {
+    const k = i.feature_key ? (i.feature_key + (i.feature_summary ? ' · ' + i.feature_summary.slice(0,45) : '')) : '(no RHSTOR epic)';
+    byFeature[k] = (byFeature[k]||0) + 1;
+  });
+  document.getElementById('ov-feature-epic').innerHTML = countRows(byFeature, () => "#6639b7");
 }
 
 // ── sort ───────────────────────────────────────────────────────────────────────
