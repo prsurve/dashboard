@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DR Bugs &amp; Features — RHSTOR + OCSQE</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px;
+          background:#ffffff; color:#24292f; padding:24px; }
+  h1   { font-size:20px; font-weight:700; margin-bottom:4px; }
+  h2   { font-size:15px; font-weight:600; margin:24px 0 10px; color:#24292f; }
+  .sub { font-size:12px; color:#57606a; margin-bottom:16px; }
+  .cards { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px; }
+  .stat-card {
+    cursor:pointer; padding:10px 18px; border:1.5px solid #d0d7de; border-radius:10px;
+    background:#f6f8fa; text-align:center; min-width:80px;
+    transition:border-color .15s, background .15s, box-shadow .15s; user-select:none;
+  }
+  .stat-card:hover { border-color:#3b82d4; background:#eaf3ff; box-shadow:0 2px 6px rgba(59,130,212,.18); }
+  .stat-card.active { border-color:#0969da; background:#dbeafe; box-shadow:0 0 0 2px #0969da; }
+  /* ── version chips ── */
+  .chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; align-items:center; }
+  .chips-label { font-size:12px; color:#57606a; margin-right:2px; }
+  .chip {
+    cursor:pointer; padding:5px 12px; border:1.5px solid #d0d7de; border-radius:16px;
+    background:#fff; font-size:12px; font-weight:600; color:#24292f; user-select:none;
+    transition:border-color .15s, background .15s, box-shadow .15s;
+  }
+  .chip:hover { border-color:#8250df; background:#faf5ff; }
+  .chip.active { border-color:#8250df; background:#8250df; color:#fff; box-shadow:0 0 0 2px rgba(130,80,223,.25); }
+  .chip .cnt { opacity:.75; font-weight:500; margin-left:4px; }
+  /* ── tabs ── */
+  .tabs     { display:flex; gap:0; border-bottom:2px solid #d0d7de; margin-bottom:18px; }
+  .tab-btn  { padding:8px 20px; font-size:13px; font-weight:600; color:#57606a; background:none;
+               border:none; border-bottom:3px solid transparent; cursor:pointer; margin-bottom:-2px; }
+  .tab-btn:hover  { color:#24292f; }
+  .tab-btn.active { color:#0969da; border-bottom-color:#0969da; }
+  .tab-panel      { display:none; }
+  .tab-panel.active { display:block; }
+  /* ── table ── */
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th    { background:#f6f8fa; border:1px solid #d0d7de; padding:8px 10px; text-align:left;
+           font-size:12px; font-weight:600; color:#57606a; cursor:pointer; white-space:nowrap;
+           user-select:none; position:relative; }
+  th:hover { background:#eaeef2; }
+  th.asc::after  { content:" ▲"; font-size:9px; }
+  th.desc::after { content:" ▼"; font-size:9px; }
+  td    { border:1px solid #d0d7de; padding:7px 10px; vertical-align:top; }
+  tr:hover td { background:#f6f8fa; }
+  input.search { width:100%; max-width:400px; padding:6px 10px; margin-bottom:14px;
+                 border:1px solid #d0d7de; border-radius:6px; font-size:13px; }
+  .footer { margin-top:24px; font-size:11px; color:#57606a; text-align:center;
+             border-top:1px solid #d0d7de; padding-top:12px; }
+  .section-box { background:#f6f8fa; border:1px solid #d0d7de; border-radius:6px;
+                  padding:16px 20px; margin-bottom:20px; }
+  .ver-badge { display:inline-block; margin:1px 2px; padding:1px 7px; border-radius:10px;
+               font-size:10px; font-weight:600; border:1px solid #d9c7f5; color:#6639b7; background:#f6efff; }
+  /* ── live refresh pill ── */
+  .live-pill { display:inline-block; font-size:11px; font-weight:600; padding:2px 9px; border-radius:12px;
+               background:#dafbe1; color:#1a7f37; border:1px solid #aceebb; }
+  .live-pill.stale { background:#fff8c5; color:#9a6700; border-color:#eac54f; }
+  .live-pill.error { background:#ffebe9; color:#cf222e; border-color:#ff8182; }
+  .live-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#1a7f37;
+              margin-right:5px; vertical-align:middle; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .refreshing .live-dot { animation:pulse 1s infinite; }
+</style>
+</head>
+<body>
+<h1>🔺 DR Bugs &amp; Features — <span id="projects">RHSTOR + OCSQE</span></h1>
+<div class="sub">
+  <span id="gen-info">Loading data…</span>
+  &nbsp;·&nbsp;
+  <span id="live-status" class="live-pill"><span class="live-dot"></span>live</span>
+</div>
+
+<!-- version chips apply across every tab -->
+<div class="chips" id="chips"><span class="chips-label">Versions:</span></div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('bugs',this)">🐞 Bugs</button>
+  <button class="tab-btn" onclick="showTab('features',this)">✨ Features</button>
+  <button class="tab-btn" onclick="showTab('overview',this)">📊 Overview</button>
+</div>
+
+<!-- ═══════════════════════ TAB : BUGS ══════════════════════════════════════ -->
+<div id="tab-bugs" class="tab-panel active">
+  <div class="cards" id="bugs-cards"></div>
+  <input class="search" type="search" placeholder="Filter by key, summary, assignee…" oninput="filterBugs()">
+  <table id="bugs-table">
+    <thead>
+      <tr>
+        <th onclick="sortBugs(0)">Key</th>
+        <th onclick="sortBugs(1)">Summary</th>
+        <th onclick="sortBugs(2)">Status</th>
+        <th onclick="sortBugs(3)">Priority</th>
+        <th onclick="sortBugs(4)">Assignee</th>
+        <th onclick="sortBugs(5)">QA Contact</th>
+        <th>Version</th>
+        <th onclick="sortBugs(7)">Age</th>
+        <th onclick="sortBugs(8)">Updated</th>
+      </tr>
+    </thead>
+    <tbody id="bugs-tbody"></tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════ TAB : FEATURES ══════════════════════════════════ -->
+<div id="tab-features" class="tab-panel">
+  <div class="cards" id="features-cards"></div>
+  <input class="search" type="search" placeholder="Filter by key, summary, assignee…" oninput="filterFeatures()">
+  <table id="features-table">
+    <thead>
+      <tr>
+        <th onclick="sortFeatures(0)">Key</th>
+        <th onclick="sortFeatures(1)">Summary</th>
+        <th onclick="sortFeatures(2)">Type</th>
+        <th onclick="sortFeatures(3)">Status</th>
+        <th onclick="sortFeatures(4)">Assignee</th>
+        <th>Version</th>
+        <th onclick="sortFeatures(6)">Age</th>
+        <th onclick="sortFeatures(7)">Updated</th>
+      </tr>
+    </thead>
+    <tbody id="features-tbody"></tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════ TAB : OVERVIEW ══════════════════════════════════ -->
+<div id="tab-overview" class="tab-panel">
+  <div class="auto-note" style="font-size:11px;color:#57606a;background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:8px 12px;margin-bottom:16px;display:inline-block">
+    Counts below respect the version chips selected above. Data regenerated hourly; page auto-refreshes every 5 min.
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div class="section-box">
+      <h2 style="margin-top:0">🐞 Bugs by status</h2>
+      <table style="margin-top:8px"><tbody id="ov-bug-status"></tbody></table>
+    </div>
+    <div class="section-box">
+      <h2 style="margin-top:0">✨ Features by status</h2>
+      <table style="margin-top:8px"><tbody id="ov-feat-status"></tbody></table>
+    </div>
+    <div class="section-box">
+      <h2 style="margin-top:0">🐞 Bugs by version</h2>
+      <table style="margin-top:8px"><tbody id="ov-bug-version"></tbody></table>
+    </div>
+    <div class="section-box">
+      <h2 style="margin-top:0">✨ Features by version</h2>
+      <table style="margin-top:8px"><tbody id="ov-feat-version"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  DR Jira Dashboard &nbsp;·&nbsp; <span id="footer-projects"></span> &nbsp;·&nbsp;
+  <span id="footer-gen"></span> &nbsp;·&nbsp; data regenerated hourly · page auto-refreshes every 5 min
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+//  DR Jira Dashboard — static shell. Data comes from ./data.json (regenerated
+//  hourly by GitHub Actions). Fetched on load and re-fetched every 5 min so an
+//  open tab stays live. All views (chips, cards, tables) are computed here in JS.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const REFRESH_MS = 5 * 60 * 1000;   // poll data.json every 5 minutes
+const STALE_MS   = 90 * 60 * 1000;  // flag data stale after 90 min (hourly build)
+
+let DATA = null;            // last successfully loaded payload
+let _activeTab = 'bugs';    // current tab (kept in sync with the URL)
+
+// status-category → colour (Jira: new | indeterminate | done)
+const CAT_COLOR = { "new":"#57606a", "indeterminate":"#9a6700", "done":"#1a7f37", "":"#57606a" };
+const CAT_LABEL = { "new":"To Do", "indeterminate":"In Progress", "done":"Done", "":"Unknown" };
+const PRIO_COLOR = {
+  "Blocker":"#cf222e", "Critical":"#cf222e", "Major":"#e06c10", "Urgent":"#cf222e",
+  "Normal":"#3b82d4", "Minor":"#57606a", "Undefined":"#8c959f", "Trivial":"#8c959f", "":"#8c959f"
+};
+
+// ── helpers ───────────────────────────────────────────────────────────────────
+function esc(v){
+  if (v === null || v === undefined) return "";
+  return String(v).replace(/[&<>"']/g, c => (
+    {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function badge(text, color){
+  return '<span style="display:inline-block;padding:1px 7px;border-radius:12px;font-size:11px;'
+       + 'font-weight:600;color:#fff;background:' + color + '">' + esc(text) + '</span>';
+}
+function verBadges(versions){
+  if (!versions || !versions.length) return '<span style="color:#8c959f">—</span>';
+  return versions.map(v => '<span class="ver-badge">' + esc(v) + '</span>').join("");
+}
+function parseDt(iso){ if(!iso) return null; const d = new Date(iso); return isNaN(d)?null:d; }
+function daysSince(iso){ const d = parseDt(iso); return d ? Math.floor((Date.now()-d.getTime())/86400000) : 0; }
+function shortDate(iso){ const d = parseDt(iso); return d ? d.toISOString().slice(0,10) : "—"; }
+
+// ── tabs ────────────────────────────────────────────────────────────────────
+function showTab(id, btn){
+  _activeTab = id;
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const panel = document.getElementById('tab-' + id);
+  if (panel) panel.classList.add('active');
+  if (btn) btn.classList.add('active');
+  else document.querySelectorAll('.tab-btn').forEach(b => {
+    if ((b.getAttribute('onclick')||'').includes("'" + id + "'")) b.classList.add('active');
+  });
+  _syncUrl();
+}
+
+// ── filter state ────────────────────────────────────────────────────────────
+// Versions (chips) apply across all tabs. Status cards are per-tab.
+const _verSel = new Set();                              // selected versions (empty = all)
+const _statusSel = { bugs: new Set(), features: new Set() };  // selected status categories per tab
+
+// ── version chips ─────────────────────────────────────────────────────────────
+function allVersions(){
+  const set = new Set();
+  if (DATA){
+    (DATA.bugs||[]).forEach(i => (i.versions||[]).forEach(v => set.add(v)));
+    (DATA.features||[]).forEach(i => (i.versions||[]).forEach(v => set.add(v)));
+  }
+  // sort descending (newest-looking first) but keep deterministic
+  return [...set].sort().reverse();
+}
+function versionCount(version){
+  let n = 0;
+  (DATA.bugs||[]).forEach(i => { if ((i.versions||[]).includes(version)) n++; });
+  (DATA.features||[]).forEach(i => { if ((i.versions||[]).includes(version)) n++; });
+  return n;
+}
+function renderChips(){
+  const versions = allVersions();
+  const total = (DATA.bug_count||0) + (DATA.feature_count||0);
+  let html = '<span class="chips-label">Versions:</span>';
+  html += '<span class="chip' + (_verSel.size===0?' active':'') + '" data-ver="__all__" onclick="toggleVersion(\'__all__\',this)">All<span class="cnt">' + total + '</span></span>';
+  versions.forEach(v => {
+    html += '<span class="chip' + (_verSel.has(v)?' active':'') + '" data-ver="' + esc(v) + '" onclick="toggleVersion(\'' + v.replace(/'/g,"\\'") + '\',this)">'
+          + esc(v) + '<span class="cnt">' + versionCount(v) + '</span></span>';
+  });
+  document.getElementById('chips').innerHTML = html;
+}
+function toggleVersion(v, el){
+  if (v === '__all__'){ _verSel.clear(); }
+  else { if (_verSel.has(v)) _verSel.delete(v); else _verSel.add(v); }
+  renderChips();
+  rerenderAll();
+  _syncUrl();
+}
+function matchesVersion(issue){
+  if (_verSel.size === 0) return true;
+  return (issue.versions||[]).some(v => _verSel.has(v));
+}
+
+// ── stat cards (per tab, by status category) ────────────────────────────────────
+function statCard(label, value, color, catVal, tab){
+  const cv = catVal || "all";
+  return '<div class="stat-card" data-cat="' + esc(cv) + '" onclick="toggleStatus(\'' + tab + '\',\'' + cv + '\')">'
+       + '<div style="font-size:22px;font-weight:700;color:' + color + '">' + esc(value) + '</div>'
+       + '<div style="font-size:11px;color:#57606a;margin-top:2px">' + esc(label) + '</div></div>';
+}
+function toggleStatus(tab, cat){
+  const sel = _statusSel[tab];
+  if (cat === 'all'){ sel.clear(); }
+  else { if (sel.has(cat)) sel.delete(cat); else sel.add(cat); }
+  highlightCards(tab);
+  (tab === 'bugs' ? filterBugs : filterFeatures)();
+  _syncUrl();
+}
+function highlightCards(tab){
+  const sel = _statusSel[tab];
+  document.querySelectorAll('#' + tab + '-cards .stat-card').forEach(c => {
+    c.classList.remove('active');
+    const cv = c.dataset.cat;
+    if (cv === 'all'){ if (!sel.size) c.classList.add('active'); }
+    else if (sel.has(cv)) c.classList.add('active');
+  });
+}
+function renderCards(tab, items){
+  const vis = items.filter(matchesVersion);
+  const byCat = {};
+  vis.forEach(i => { byCat[i.status_category] = (byCat[i.status_category]||0) + 1; });
+  let html = statCard("Total", vis.length, "#3b82d4", "all", tab);
+  ["new","indeterminate","done"].forEach(cat => {
+    html += statCard(CAT_LABEL[cat], byCat[cat]||0, CAT_COLOR[cat], cat, tab);
+  });
+  document.getElementById(tab + '-cards').innerHTML = html;
+  highlightCards(tab);
+}
+
+// ── table rendering ─────────────────────────────────────────────────────────────
+function keyLink(issue){
+  return '<a href="' + esc(issue.url) + '" target="_blank" style="color:#0969da;font-weight:600;text-decoration:none">'
+       + esc(issue.key) + '</a>';
+}
+function summaryCell(issue){
+  let html = '<a href="' + esc(issue.url) + '" target="_blank" style="color:#24292f;text-decoration:none" title="' + esc(issue.summary) + '">'
+           + esc(issue.summary) + '</a>';
+  if (issue.parent_key)
+    html += '<div style="font-size:10px;color:#8c959f;margin-top:2px">↳ ' + esc(issue.parent_key)
+          + (issue.parent_summary ? ' · ' + esc(issue.parent_summary.slice(0,50)) : '') + '</div>';
+  return html;
+}
+function renderBugs(items){
+  const rows = items.filter(matchesVersion).map(i =>
+    '<tr data-cat="' + esc(i.status_category) + '">'
+    + '<td style="white-space:nowrap">' + keyLink(i) + '</td>'
+    + '<td style="font-size:12px">' + summaryCell(i) + '</td>'
+    + '<td>' + badge(i.status || "—", CAT_COLOR[i.status_category] || "#57606a") + '</td>'
+    + '<td style="font-size:12px">' + badge(i.priority || "—", PRIO_COLOR[i.priority] || "#8c959f") + '</td>'
+    + '<td style="font-size:12px;color:#57606a;white-space:nowrap">' + esc(i.assignee || "—") + '</td>'
+    + '<td style="font-size:12px;color:#57606a;white-space:nowrap">' + esc(i.qa_contact || "—") + '</td>'
+    + '<td style="font-size:11px">' + verBadges(i.versions) + '</td>'
+    + '<td style="font-size:12px;white-space:nowrap">' + i.age_days + 'd</td>'
+    + '<td style="font-size:12px;color:#57606a;white-space:nowrap">' + shortDate(i.updated) + '</td>'
+    + '</tr>'
+  ).join("");
+  document.getElementById('bugs-tbody').innerHTML = rows ||
+    '<tr><td colspan="9" style="color:#57606a;text-align:center;padding:16px">No bugs match the current filters</td></tr>';
+}
+function renderFeatures(items){
+  const rows = items.filter(matchesVersion).map(i =>
+    '<tr data-cat="' + esc(i.status_category) + '">'
+    + '<td style="white-space:nowrap">' + keyLink(i) + '</td>'
+    + '<td style="font-size:12px">' + summaryCell(i) + '</td>'
+    + '<td style="font-size:12px">' + esc(i.type || "—") + '</td>'
+    + '<td>' + badge(i.status || "—", CAT_COLOR[i.status_category] || "#57606a") + '</td>'
+    + '<td style="font-size:12px;color:#57606a;white-space:nowrap">' + esc(i.assignee || "—") + '</td>'
+    + '<td style="font-size:11px">' + verBadges(i.versions) + '</td>'
+    + '<td style="font-size:12px;white-space:nowrap">' + i.age_days + 'd</td>'
+    + '<td style="font-size:12px;color:#57606a;white-space:nowrap">' + shortDate(i.updated) + '</td>'
+    + '</tr>'
+  ).join("");
+  document.getElementById('features-tbody').innerHTML = rows ||
+    '<tr><td colspan="8" style="color:#57606a;text-align:center;padding:16px">No features match the current filters</td></tr>';
+}
+
+// ── search + status filter (hide/show rows) ─────────────────────────────────────
+function _filterTable(tableId, searchEl, tab){
+  const q = searchEl.value.toLowerCase();
+  const sel = _statusSel[tab];
+  document.querySelectorAll('#' + tableId + ' tbody tr').forEach(row => {
+    const catOk  = !sel.size || sel.has(row.dataset.cat || '');
+    const textOk = !q || row.innerText.toLowerCase().includes(q);
+    row.style.display = (catOk && textOk) ? '' : 'none';
+  });
+}
+function filterBugs(){ _filterTable('bugs-table', document.querySelector('#tab-bugs .search'), 'bugs'); _syncUrl(); }
+function filterFeatures(){ _filterTable('features-table', document.querySelector('#tab-features .search'), 'features'); _syncUrl(); }
+
+// ── overview tab ────────────────────────────────────────────────────────────────
+function countRows(map, colorFn){
+  const entries = Object.entries(map).sort((a,b) => b[1]-a[1]);
+  if (!entries.length) return '<tr><td style="color:#57606a;padding:10px;border:none">None</td></tr>';
+  const max = entries[0][1] || 1;
+  return entries.map(([name, n]) => {
+    const pct = Math.round(n/max*100);
+    const color = colorFn ? colorFn(name) : "#3b82d4";
+    return '<tr>'
+      + '<td style="font-size:12px;white-space:nowrap;border:none;padding:4px 8px">' + esc(name) + '</td>'
+      + '<td style="width:55%;border:none;padding:4px 8px"><div style="background:#eaeef2;border-radius:4px;height:14px">'
+      + '<div style="width:' + pct + '%;background:' + color + ';height:14px;border-radius:4px"></div></div></td>'
+      + '<td style="font-weight:600;text-align:right;width:36px;border:none;padding:4px 8px">' + n + '</td></tr>';
+  }).join("");
+}
+function renderOverview(){
+  const bugs = (DATA.bugs||[]).filter(matchesVersion);
+  const feats = (DATA.features||[]).filter(matchesVersion);
+  const byStatus = items => { const m={}; items.forEach(i => { const k=CAT_LABEL[i.status_category]||"Unknown"; m[k]=(m[k]||0)+1; }); return m; };
+  const byVersion = items => { const m={}; items.forEach(i => { (i.versions.length?i.versions:["(none)"]).forEach(v => m[v]=(m[v]||0)+1); }); return m; };
+  const statusColor = lbl => ({ "To Do":"#57606a","In Progress":"#9a6700","Done":"#1a7f37" }[lbl] || "#3b82d4");
+  document.getElementById('ov-bug-status').innerHTML  = countRows(byStatus(bugs), statusColor);
+  document.getElementById('ov-feat-status').innerHTML = countRows(byStatus(feats), statusColor);
+  document.getElementById('ov-bug-version').innerHTML  = countRows(byVersion(bugs), () => "#8250df");
+  document.getElementById('ov-feat-version').innerHTML = countRows(byVersion(feats), () => "#8250df");
+}
+
+// ── sort ───────────────────────────────────────────────────────────────────────
+function _sortTableBy(table, col, asc, numericCols){
+  const rows = Array.from(table.tBodies[0].rows);
+  rows.sort((a, b) => {
+    let av = a.cells[col].innerText.trim(), bv = b.cells[col].innerText.trim();
+    if (numericCols.includes(col)){
+      av = parseFloat(av.replace(/[^0-9.]/g, '')) || 0;
+      bv = parseFloat(bv.replace(/[^0-9.]/g, '')) || 0;
+      return asc ? av - bv : bv - av;
+    }
+    return asc ? av.localeCompare(bv) : bv.localeCompare(av);
+  });
+  rows.forEach(r => table.tBodies[0].appendChild(r));
+}
+let _bSortCol=-1,_bSortAsc=true;
+function sortBugs(col){
+  const t=document.getElementById('bugs-table'), ths=t.querySelectorAll('th');
+  if(_bSortCol===col)_bSortAsc=!_bSortAsc; else {_bSortCol=col;_bSortAsc=true;}
+  ths.forEach(th=>th.classList.remove('asc','desc')); ths[col].classList.add(_bSortAsc?'asc':'desc');
+  _sortTableBy(t, col, _bSortAsc, [7]);
+}
+let _fSortCol=-1,_fSortAsc=true;
+function sortFeatures(col){
+  const t=document.getElementById('features-table'), ths=t.querySelectorAll('th');
+  if(_fSortCol===col)_fSortAsc=!_fSortAsc; else {_fSortCol=col;_fSortAsc=true;}
+  ths.forEach(th=>th.classList.remove('asc','desc')); ths[col].classList.add(_fSortAsc?'asc':'desc');
+  _sortTableBy(t, col, _fSortAsc, [6]);
+}
+
+// ── shareable URL state (versions + tab + per-tab status + search) ──────────────
+function _syncUrl(){
+  const p = new URLSearchParams();
+  if (_verSel.size) p.set('ver', [..._verSel].join('|'));
+  if (_statusSel.bugs.size) p.set('bstatus', [..._statusSel.bugs].join(','));
+  if (_statusSel.features.size) p.set('fstatus', [..._statusSel.features].join(','));
+  const bq = document.querySelector('#tab-bugs .search').value.trim();
+  const fq = document.querySelector('#tab-features .search').value.trim();
+  if (bq) p.set('bq', bq);
+  if (fq) p.set('fq', fq);
+  if (_activeTab && _activeTab !== 'bugs') p.set('tab', _activeTab);
+  const qs = p.toString();
+  history.replaceState(null, '', qs ? ('?' + qs) : location.pathname);
+}
+function _applyUrlState(){
+  const p = new URLSearchParams(location.search);
+  const ver = p.get('ver');
+  if (ver) ver.split('|').filter(Boolean).forEach(v => _verSel.add(v));
+  const bs = p.get('bstatus'); if (bs) bs.split(',').filter(Boolean).forEach(s => _statusSel.bugs.add(s));
+  const fs = p.get('fstatus'); if (fs) fs.split(',').filter(Boolean).forEach(s => _statusSel.features.add(s));
+  const bq = p.get('bq'); if (bq) document.querySelector('#tab-bugs .search').value = bq;
+  const fq = p.get('fq'); if (fq) document.querySelector('#tab-features .search').value = fq;
+  const tab = p.get('tab'); if (tab) showTab(tab);
+}
+
+// ── column resize (drag right edge of any <th>) ─────────────────────────────────
+(function(){
+  let _th=null,_x=0,_w=0;
+  document.addEventListener('mousemove', e => { if(!_th) return; const w=Math.max(40,_w+e.clientX-_x); _th.style.width=w+'px'; _th.style.minWidth=w+'px'; });
+  document.addEventListener('mouseup', () => { _th=null; });
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('th').forEach(th => {
+      const h=document.createElement('div');
+      h.style.cssText='position:absolute;right:0;top:0;width:6px;height:100%;cursor:col-resize;z-index:1';
+      h.addEventListener('mousedown', e => { e.preventDefault(); _th=th; _x=e.clientX; _w=th.offsetWidth; });
+      th.appendChild(h);
+    });
+  });
+})();
+
+// ── live status pill ────────────────────────────────────────────────────────────
+function setLive(state, text){
+  const pill = document.getElementById('live-status');
+  pill.className = 'live-pill' + (state === 'ok' ? '' : ' ' + state);
+  pill.innerHTML = '<span class="live-dot"></span>' + esc(text);
+}
+
+// ── rerender everything that depends on the version selection ───────────────────
+function rerenderAll(){
+  renderCards('bugs', DATA.bugs||[]);
+  renderCards('features', DATA.features||[]);
+  renderBugs(DATA.bugs||[]);
+  renderFeatures(DATA.features||[]);
+  renderOverview();
+  // re-apply per-tab search + status filters after tbodies were replaced
+  filterBugsNoSync(); filterFeaturesNoSync();
+}
+function filterBugsNoSync(){ _filterTable('bugs-table', document.querySelector('#tab-bugs .search'), 'bugs'); }
+function filterFeaturesNoSync(){ _filterTable('features-table', document.querySelector('#tab-features .search'), 'features'); }
+
+// ── full render from a payload ──────────────────────────────────────────────────
+let _firstRender = true;
+function render(payload){
+  DATA = payload;
+  const projects = (payload.projects || []).join(" + ");
+  document.getElementById('projects').textContent = projects || "";
+  document.getElementById('footer-projects').textContent = projects || "";
+
+  const gen = parseDt(payload.generated_at);
+  const genStr = gen ? gen.toISOString().slice(0,16).replace('T',' ') + ' UTC' : 'unknown';
+  document.getElementById('gen-info').textContent =
+    'Generated ' + genStr + ' · ' + (payload.bug_count||0) + ' bugs · ' + (payload.feature_count||0) + ' features';
+  document.getElementById('footer-gen').textContent = genStr;
+
+  if (_firstRender){
+    // pre-select configured active versions that actually exist in the data
+    const present = new Set(allVersions());
+    (payload.active_versions || []).forEach(v => { if (present.has(v)) _verSel.add(v); });
+    _applyUrlState();   // URL overrides/augments defaults
+    _firstRender = false;
+  }
+
+  renderChips();
+  rerenderAll();
+
+  if (gen && (Date.now() - gen.getTime() > STALE_MS)) setLive('stale', 'data may be stale');
+  else setLive('ok', 'live');
+}
+
+// ── fetch + poll ────────────────────────────────────────────────────────────────
+async function load(){
+  document.body.classList.add('refreshing');
+  try {
+    const resp = await fetch('./data.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    render(await resp.json());
+  } catch (err) {
+    if (DATA) setLive('stale', 'refresh failed — showing last data');
+    else {
+      setLive('error', 'failed to load data.json');
+      document.getElementById('gen-info').textContent = 'Could not load data.json (' + esc(err.message) + ')';
+    }
+  } finally {
+    document.body.classList.remove('refreshing');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  load();
+  setInterval(load, REFRESH_MS);
+  document.addEventListener('visibilitychange', function(){ if (!document.hidden) load(); });
+});
+</script>
+</body>
+</html>

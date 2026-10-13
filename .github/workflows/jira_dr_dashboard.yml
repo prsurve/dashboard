@@ -1,0 +1,66 @@
+name: DR Jira Dashboard
+
+# ── Triggers ──────────────────────────────────────────────────────────────────
+# • Scheduled : every hour, on the hour (GitHub may delay a run a few min under load)
+# • Manual    : Actions → DR Jira Dashboard → Run workflow
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    name: Generate DR Jira Dashboard
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      # Generates data.json from Jira Cloud (redhat.atlassian.net).
+      # Requires two repo secrets (Settings → Secrets and variables → Actions):
+      #   JIRA_EMAIL      — your Red Hat Atlassian account email
+      #   JIRA_API_TOKEN  — an Atlassian API token (id.atlassian.com)
+      - name: Generate data.json
+        env:
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        run: |
+          python jira-dr/jira_dr_agent.py --json-out /tmp/data.json
+          echo "data.json generated."
+
+      # The page itself (jira-dr/index.html) is a static shell committed to the repo.
+      # It fetches ./data.json on load and re-polls it every 5 min.
+      - name: Prepare Pages directory
+        run: |
+          mkdir -p /tmp/pages/jira-dr
+          cp jira-dr/index.html /tmp/pages/jira-dr/index.html
+          cp /tmp/data.json /tmp/pages/jira-dr/data.json
+          echo "theme: ~" > /tmp/pages/_config.yml
+          echo "Built: $(date -u '+%Y-%m-%d %H:%M UTC')" > /tmp/pages/build.txt
+
+      # keep_files:true means the sibling rdr/ dashboard on gh-pages is never touched.
+      # Dashboard URL: https://prsurve.github.io/dashboard/jira-dr/
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: /tmp/pages
+          publish_branch: gh-pages
+          commit_message: "chore: update DR Jira dashboard [skip ci]"
+          user_name: "github-actions[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"
+          keep_files: true
