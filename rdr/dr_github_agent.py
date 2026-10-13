@@ -1363,6 +1363,31 @@ document.addEventListener('DOMContentLoaded', function() {{
         logger.info(f"HTML report written to: {path}")
         return path
 
+    # ── JSON export (data source for the live static dashboard) ────────────────
+
+    @staticmethod
+    def export_json(
+        prs: List[Dict[str, Any]], path: str, repo: str = OWNER_REPO
+    ) -> str:
+        """
+        Write the enriched PR list to *path* as ``data.json`` and return the path.
+
+        This is the single source of truth consumed by the static ``index.html``
+        shell, which fetches it on load and re-fetches it on a timer.  All derived
+        views (summary cards, metrics, scoring) are computed client-side in JS, so
+        this payload stays minimal — just metadata plus the raw enriched records.
+        """
+        payload = {
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "repo": repo,
+            "pr_count": len(prs),
+            "prs": prs,
+        }
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(payload, fh, default=str)
+        logger.info(f"JSON data written to: {path}")
+        return path
+
     # ── Slack export ──────────────────────────────────────────────────────────
 
     @staticmethod
@@ -1576,6 +1601,12 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Write a self-contained HTML report (default filename: rdr_prs.html)",
     )
     p.add_argument(
+        "--json-out",
+        dest="json_out",
+        metavar="FILE",
+        help="Write enriched PR data as data.json for the live static dashboard",
+    )
+    p.add_argument(
         "--slack",
         metavar="WEBHOOK_URL",
         help="Post the summary to a Slack channel via Incoming Webhook URL",
@@ -1624,6 +1655,11 @@ def main() -> None:
         agent.print_detail(matches[0])
         return
 
+    # ── JSON output (feeds the live static dashboard) ──────────────────────────
+    if args.json_out:
+        out_path = agent.export_json(prs, path=args.json_out, repo=args.repo)
+        print(f"JSON data written → {out_path}")
+
     # ── HTML output ───────────────────────────────────────────────────────────
     if args.html:
         out_path = agent.export_html(prs, path=args.html)
@@ -1635,13 +1671,14 @@ def main() -> None:
         if not ok:
             sys.exit(1)
 
-    # ── terminal output (always shown unless --html/--slack only flags used) ──
-    if not args.html and not args.slack:
+    # ── terminal output (always shown unless a file/slack output flag used) ──
+    wrote_file = args.html or args.json_out
+    if not wrote_file and not args.slack:
         if not args.summary_only:
             agent.print_table(prs)
         agent.print_summary(prs)
     elif not args.summary_only and not args.slack:
-        # HTML was written; also print a quick terminal summary for confirmation
+        # A file was written; also print a quick terminal summary for confirmation
         agent.print_summary(prs)
 
 

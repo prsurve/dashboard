@@ -9,12 +9,36 @@ description: >
 
 # PR Dashboard Skill
 
-This skill guides you through building or modifying a self-contained GitHub
-PR dashboard — a single Python script + a GitHub Actions workflow that
-generates a multi-tab HTML report and deploys it to GitHub Pages daily.
+This skill guides you through building or modifying a GitHub PR dashboard —
+a Python script + a static HTML shell + a GitHub Actions workflow that deploys
+to GitHub Pages.
 
-The canonical reference implementation lives in `rdr/dr_github_agent.py`
-(the RDR squad dashboard). Use it as the base for every new dashboard.
+## Architecture: data/view split (live dashboard)
+
+The dashboard uses a **JSON + static-shell** split so the page updates
+frequently without rebuilding HTML:
+
+- **`<squad>/dr_github_agent.py`** — run with `--json-out data.json`, it fetches
+  and enriches the PRs and writes **only** `data.json` (metadata + raw PR
+  records). This is the single source of truth.
+- **`<squad>/index.html`** — a *static shell* committed to the repo. It
+  `fetch()`es `./data.json`, renders all tabs client-side (cards, tables,
+  metrics, scoring), and **auto-polls `data.json` every 5 min** (plus on tab
+  re-focus). A live/stale/error pill shows freshness.
+- **Workflow** — runs **hourly**, regenerates `data.json`, and deploys the
+  static shell + fresh data. Only the small JSON changes between runs, so the
+  HTML no longer churns in git.
+
+All derived views (summary cards, metrics, merge-score) are computed in JS from
+the `prs` array — keep the Python→JS logic in sync when changing either side.
+
+The canonical reference implementation lives in `rdr/dr_github_agent.py` +
+`rdr/index.html` (the RDR squad dashboard). Use it as the base for every new
+dashboard.
+
+> Legacy note: `dr_github_agent.py` still has a `--html` flag that bakes a
+> self-contained static report (data embedded). It's kept for local one-off use
+> only — the deployed dashboard uses `--json-out` + the static shell.
 
 ---
 
@@ -48,16 +72,17 @@ Then skim the `export_html`, `_merge_score`, and `post_slack` symbols using
 
 ---
 
-## Step 3 — Create the New Agent File
+## Step 3 — Create the New Agent File + Static Shell
 
-Copy the reference implementation to a new subdirectory named after the squad slug:
+Copy **both** reference files to a new subdirectory named after the squad slug:
 
 ```
 <repo-root>/<squad-slug>/dr_github_agent.py   (e.g. mcg/dr_github_agent.py)
+<repo-root>/<squad-slug>/index.html           (the static shell)
 ```
 
-Make the following targeted substitutions using `apply_diff` or
-`search_and_replace` — **never rewrite the whole file**:
+In `dr_github_agent.py`, make the following targeted substitutions using
+`apply_diff` or `search_and_replace` — **never rewrite the whole file**:
 
 | Constant | New value |
 |---|---|
@@ -65,9 +90,17 @@ Make the following targeted substitutions using `apply_diff` or
 | `RDR_KEYWORDS` | New keyword list (keep format — one string per line) |
 | `RDR_LABELS` | New label set |
 | Module docstring | Update squad name and repo references |
-| HTML title / `<h1>` emoji+name | Match the new squad (e.g. `🟡 MCG Dashboard`) |
 
-Leave all other logic (pagination, enrichment, scoring, JS, CSS) untouched.
+In `index.html`, update only the display strings:
+
+| Field | Change to |
+|---|---|
+| `<title>` | `<Squad> Dashboard` |
+| `<h1>` emoji + name | Match the new squad (e.g. `🟡 MCG Dashboard`) |
+
+Leave all other logic (pagination, enrichment, the JS render/filter/sort/poll
+code, CSS) untouched. `data.json` is squad-agnostic — the shell adapts to
+whatever the agent emits.
 
 ---
 
@@ -83,23 +116,37 @@ Key substitutions:
 | `name:` | `<Squad> PR Dashboard` |
 | script path in `run:` | `<squad-slug>/dr_github_agent.py` |
 | `--repo` flag | New target repo |
-| `publish_dir` Pages prep | `mkdir -p /tmp/pages/<squad-slug>` + copy |
+| `--json-out` output | `/tmp/data.json` |
+| Pages prep | `mkdir -p /tmp/pages/<squad-slug>`, then copy **both** `<squad-slug>/index.html` and `/tmp/data.json` into it |
 | Workflow file name | `<squad-slug>_dashboard.yml` |
 
 Keep `--no-checks --workers 10 --state all` — these are always the right
-defaults for the scheduled job.
+defaults for the scheduled job. Use `--json-out /tmp/data.json` (not `--html`):
+the deployed page is the static shell, which fetches `data.json`.
+
+The schedule is **hourly** (`cron: "0 * * * *"`). The published page auto-polls
+`data.json` every 5 min, so viewers see fresh data within minutes of each build
+without a manual refresh.
 
 ---
 
 ## Step 5 — Validate
 
-Run a syntax check before committing:
+Syntax-check the agent, then smoke-test the shell + data locally:
 
 ```
 python3 -m py_compile <squad-slug>/dr_github_agent.py && echo OK
+
+# generate a real data.json, stage it next to the shell, serve over HTTP
+python3 <squad-slug>/dr_github_agent.py --repo <owner/repo> --no-checks \
+  --json-out /tmp/preview/<squad-slug>/data.json
+cp <squad-slug>/index.html /tmp/preview/<squad-slug>/index.html
+cd /tmp/preview && python3 -m http.server 8777
+# open http://localhost:8777/<squad-slug>/
 ```
 
-If it fails, fix the error. Do not proceed until `OK` is printed.
+`file://` will not work — the shell uses `fetch()`, which needs HTTP.
+Do not proceed until `OK` prints and the page renders all tabs.
 
 ---
 
@@ -130,8 +177,9 @@ If Pages is not enabled or the source is wrong, instruct the user to:
 ## Step 8 — Tell the User
 
 Report:
-- New agent path in the repo
-- Workflow file name and cron schedule (`0 3 * * *` = 03:00 UTC daily)
+- New agent + static shell paths in the repo
+- Workflow file name and cron schedule (`0 * * * *` = hourly)
+- That the page auto-polls `data.json` every 5 min (live without manual refresh)
 - Dashboard URL: `https://<github-user>.github.io/dashboard/<squad-slug>/`
 - How to trigger a manual run: Actions → `<Squad> PR Dashboard` → Run workflow
 
@@ -139,38 +187,47 @@ Report:
 
 ## Modifying an Existing Dashboard
 
-When the user asks to **add a tab, column, filter card, or metric** to an
-existing dashboard:
+Most presentation changes now live in **`<squad>/index.html`** (the static
+shell), not in the Python. Only touch the agent when you need a new *data*
+field in `data.json`.
 
-1. Read the relevant section of the agent with `read_file` (line range).
+When the user asks to **add a tab, column, filter card, or metric**:
+
+1. Read the relevant section of `index.html`.
 2. Identify the exact insertion point.
 3. Use `apply_diff` — one `SEARCH/REPLACE` block per change.
-4. Syntax-check, copy to the dashboard repo clone, commit, push.
+4. If the change needs a field not already in `data.json`, add it to
+   `_enrich_pr()` in the agent too (and `python3 -m py_compile` it).
+5. Commit, push.
 
 ### Adding a new filter card
-- Add a `_stat_card(...)` call after the line that builds `summary_cards`.
-- Ensure the `data-filter` value and `_applyFilters()` JS handle the new dimension.
+- Add a `statCard(...)` call inside `renderCards()` in `index.html`.
+- Ensure the `data-filter` value and `_applyFilters()` handle the new dimension
+  (`_dim()` / `_raw()` prefixes, and a matching `data-*` attr on the rows in
+  `renderPrTable()`).
 
 ### Adding a new tab
 1. Add a tab button in the `.tabs` div.
-2. Add `<div id="tab-<name>" class="tab-panel">` after the last existing panel.
-3. Populate `{new_rows}` by building the rows string in `export_html`.
-4. If the tab needs sorting, add a `sortNewTable(col)` JS function mirroring
-   the existing `sortReadyTable`.
+2. Add `<div id="tab-<name>" class="tab-panel">` with empty containers.
+3. Add a `renderNewTab(prs)` function and call it from `render()`.
+4. If the tab needs sorting, add a `sortNewTable(col)` mirroring
+   `sortReadyTable`.
 
 ### Adding a column to the PR table
 1. Add `<th onclick="sortTable(N)">Column Name</th>` at the correct index N
    in the `<thead>`.
-2. Add `<td>...</td>` at the same index N in the `rows_html` loop.
-3. If N is a numeric sort column, add it to the `[0,6,10,11,...]` array in
-   `sortTable()`.
+2. Add the matching `<td>…</td>` at the same index N in `renderPrTable()`.
+3. If N is a numeric sort column, add it to the `[0,6,10,11]` arrays passed to
+   `_sortTableBy()`.
+4. If the column needs new data, add the field in `_enrich_pr()` + `export_json`.
 
 ---
 
 ## CSS / UI Standards
 
-All dashboards in this repo share the same CSS block. When fixing or adding
-styles, follow these conventions:
+All dashboards share the same CSS block, which lives in the `<style>` section of
+each `<squad>/index.html` shell. When fixing or adding styles, follow these
+conventions:
 
 | Element | Rule |
 |---|---|
@@ -190,7 +247,8 @@ reached any other way.
 
 ## Scoring (Ready to Merge tab)
 
-The merge-readiness score is always **0–5**:
+The merge-readiness score is always **0–5**, computed in JS by `mergeScore()` in
+`index.html`:
 
 | Condition | Points |
 |---|---|
@@ -201,7 +259,8 @@ The merge-readiness score is always **0–5**:
 
 Labels: `5 = 🟢 Ready`, `4 = 🟡 Almost`, `3 = 🟠 Needs work`, `≤2 = 🔴 Blocked`
 
-Do not change the scoring formula without updating this skill.
+Do not change the scoring formula without updating this skill. (A legacy copy of
+the same formula lives in `_merge_score()` in the Python, used only by `--html`.)
 
 ---
 
@@ -218,10 +277,15 @@ Do not change the scoring formula without updating this skill.
 │       ├── rdr_dashboard.yml            ← RDR squad workflow (reference)
 │       └── <squad>_dashboard.yml        ← new squad workflow
 ├── rdr/
-│   └── dr_github_agent.py              ← RDR agent (canonical reference)
+│   ├── dr_github_agent.py              ← RDR agent (canonical reference)
+│   └── index.html                     ← static shell (fetches data.json, polls)
 └── <squad>/
-    └── dr_github_agent.py              ← new squad agent
+    ├── dr_github_agent.py              ← new squad agent
+    └── index.html                     ← new squad static shell
 ```
+
+At deploy time the workflow also writes `<squad>/data.json` onto the `gh-pages`
+branch — it is generated, not committed to `main`.
 
 Dashboard URLs follow the pattern:
 ```
@@ -234,9 +298,12 @@ https://<github-user>.github.io/dashboard/<squad-slug>/
 
 - [ ] Requirements gathered (repo, slug, keywords, labels)
 - [ ] New agent file created under `<slug>/dr_github_agent.py`
-- [ ] Constants updated (`OWNER_REPO`, `RDR_KEYWORDS`, `RDR_LABELS`, title)
+- [ ] Constants updated (`OWNER_REPO`, `RDR_KEYWORDS`, `RDR_LABELS`)
+- [ ] Static shell created under `<slug>/index.html` (title + `<h1>` updated)
 - [ ] Syntax check passes (`python3 -m py_compile`)
+- [ ] Shell smoke-tested locally over HTTP (all tabs render from data.json)
 - [ ] Workflow file created under `.github/workflows/<slug>_dashboard.yml`
+      (hourly cron, `--json-out`, copies shell + data.json to Pages)
 - [ ] Committed and pushed to `main`
 - [ ] GitHub Pages enabled on `gh-pages` branch
 - [ ] Manual workflow run triggered to verify end-to-end

@@ -1,11 +1,11 @@
 name: RDR PR Dashboard
 
 # ── Triggers ──────────────────────────────────────────────────────────────────
-# • Scheduled : every day at 03:00 UTC
+# • Scheduled : every hour, on the hour (GitHub may delay a run a few min under load)
 # • Manual    : Actions → RDR PR Dashboard → Run workflow
 on:
   schedule:
-    - cron: "0 3 * * *"
+    - cron: "0 * * * *"
   workflow_dispatch:
     inputs:
       state:
@@ -43,7 +43,7 @@ jobs:
       # --no-checks    — skips check-run API calls (faster, stays inside limits)
       # --workers 10   — fetches reviews+files for 10 PRs in parallel;
       #                  cuts 12 min serial runtime down to ~1-2 min
-      - name: Generate HTML report
+      - name: Generate data.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -52,13 +52,17 @@ jobs:
             --state ${{ github.event.inputs.state || 'all' }} \
             --no-checks \
             --workers 10 \
-            --html /tmp/index.html
-          echo "Report generated."
+            --json-out /tmp/data.json
+          echo "data.json generated."
 
+      # The page itself (rdr/index.html) is a *static shell* committed to the repo.
+      # It fetches ./data.json on load and re-polls it every 5 min, so only the
+      # data file changes between hourly runs — the HTML no longer churns.
       - name: Prepare Pages directory
         run: |
           mkdir -p /tmp/pages/rdr
-          cp /tmp/index.html /tmp/pages/rdr/index.html
+          cp rdr/index.html /tmp/pages/rdr/index.html
+          cp /tmp/data.json /tmp/pages/rdr/data.json
           echo "theme: ~" > /tmp/pages/_config.yml
           echo "Built: $(date -u '+%Y-%m-%d %H:%M UTC')" > /tmp/pages/build.txt
 
