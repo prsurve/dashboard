@@ -244,19 +244,22 @@ const _verSel = new Set();                              // selected versions (em
 const _statusSel = { bugs: new Set(), features: new Set() };  // selected status categories per tab
 
 // ── version chips ─────────────────────────────────────────────────────────────
+// Normalize differing fixVersion conventions to a short "X.Y" key so that
+// bugs ("odf-5.0") and features ("ODF v5.0.0") collapse into one "5.0" chip.
+function verKey(v){ const m = /(\d+)\.(\d+)/.exec(v || ''); return m ? (m[1] + '.' + m[2]) : (v || '(none)'); }
+function issueVerKeys(issue){ return (issue.versions || []).map(verKey); }
 function allVersions(){
   const set = new Set();
   if (DATA){
-    (DATA.bugs||[]).forEach(i => (i.versions||[]).forEach(v => set.add(v)));
-    (DATA.features||[]).forEach(i => (i.versions||[]).forEach(v => set.add(v)));
+    (DATA.bugs||[]).forEach(i => issueVerKeys(i).forEach(v => set.add(v)));
+    (DATA.features||[]).forEach(i => issueVerKeys(i).forEach(v => set.add(v)));
   }
-  // sort descending (newest-looking first) but keep deterministic
-  return [...set].sort().reverse();
+  return [...set].sort().reverse();   // newest-looking first
 }
-function versionCount(version){
+function versionCount(key){
   let n = 0;
-  (DATA.bugs||[]).forEach(i => { if ((i.versions||[]).includes(version)) n++; });
-  (DATA.features||[]).forEach(i => { if ((i.versions||[]).includes(version)) n++; });
+  (DATA.bugs||[]).forEach(i => { if (issueVerKeys(i).includes(key)) n++; });
+  (DATA.features||[]).forEach(i => { if (issueVerKeys(i).includes(key)) n++; });
   return n;
 }
 function renderChips(){
@@ -279,7 +282,7 @@ function toggleVersion(v, el){
 }
 function matchesVersion(issue){
   if (_verSel.size === 0) return true;
-  return (issue.versions||[]).some(v => _verSel.has(v));
+  return issueVerKeys(issue).some(v => _verSel.has(v));
 }
 
 // ── user-defined facet filters (apply across all tabs) ──────────────────────────
@@ -481,7 +484,7 @@ function renderOverview(){
   const bugs = (DATA.bugs||[]).filter(passesGlobal);
   const feats = (DATA.features||[]).filter(passesGlobal);
   const byStatus = items => { const m={}; items.forEach(i => { const k=CAT_LABEL[i.status_category]||"Unknown"; m[k]=(m[k]||0)+1; }); return m; };
-  const byVersion = items => { const m={}; items.forEach(i => { (i.versions.length?i.versions:["(none)"]).forEach(v => m[v]=(m[v]||0)+1); }); return m; };
+  const byVersion = items => { const m={}; items.forEach(i => { const ks=issueVerKeys(i); (ks.length?ks:["(none)"]).forEach(v => m[v]=(m[v]||0)+1); }); return m; };
   const statusColor = lbl => ({ "To Do":"#57606a","In Progress":"#9a6700","Done":"#1a7f37" }[lbl] || "#3b82d4");
   document.getElementById('ov-bug-status').innerHTML  = countRows(byStatus(bugs), statusColor);
   document.getElementById('ov-feat-status').innerHTML = countRows(byStatus(feats), statusColor);
