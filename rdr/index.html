@@ -337,21 +337,23 @@ function showTab(id, btn){
 }
 
 // ── multi-select filter state (OR within a dim, AND across dims) ───────────────
-const _sel = { status: new Set(), review: new Set(), ci: new Set() };
+const _sel = { status: new Set(), review: new Set(), ci: new Set(), conflict: new Set() };
 function _dim(val){
-  if (val === 'all')              return 'reset';
-  if (val.startsWith('review:'))  return 'review';
-  if (val.startsWith('ci:'))      return 'ci';
+  if (val === 'all')               return 'reset';
+  if (val.startsWith('review:'))   return 'review';
+  if (val.startsWith('ci:'))       return 'ci';
+  if (val.startsWith('conflict:')) return 'conflict';
   return 'status';
 }
 function _raw(val){
-  if (val.startsWith('review:'))  return val.slice(7);
-  if (val.startsWith('ci:'))      return val.slice(3);
+  if (val.startsWith('review:'))   return val.slice(7);
+  if (val.startsWith('ci:'))       return val.slice(3);
+  if (val.startsWith('conflict:')) return val.slice(9);
   return val;
 }
 function filterByStatus(val, cardEl){
   if (val === 'all'){
-    _sel.status.clear(); _sel.review.clear(); _sel.ci.clear();
+    _sel.status.clear(); _sel.review.clear(); _sel.ci.clear(); _sel.conflict.clear();
   } else {
     const dim = _dim(val), raw = _raw(val);
     if (_sel[dim].has(raw)) _sel[dim].delete(raw); else _sel[dim].add(raw);
@@ -368,9 +370,10 @@ function _highlightCards(){
     c.classList.remove('active');
     const f = c.dataset.filter;
     if (f === 'all'){
-      if (!_sel.status.size && !_sel.review.size && !_sel.ci.size) c.classList.add('active');
+      if (!_sel.status.size && !_sel.review.size && !_sel.ci.size && !_sel.conflict.size) c.classList.add('active');
     } else if (_dim(f) === 'review' && _sel.review.has(_raw(f))) c.classList.add('active');
     else if (_dim(f) === 'ci' && _sel.ci.has(_raw(f))) c.classList.add('active');
+    else if (_dim(f) === 'conflict' && _sel.conflict.has(_raw(f))) c.classList.add('active');
     else if (_dim(f) === 'status' && _sel.status.has(f)) c.classList.add('active');
   });
 }
@@ -381,6 +384,7 @@ function _syncUrl(){
   if (_sel.status.size) p.set('status', [..._sel.status].join(','));
   if (_sel.review.size) p.set('review', [..._sel.review].join(','));
   if (_sel.ci.size)     p.set('ci',     [..._sel.ci].join(','));
+  if (_sel.conflict.size) p.set('conflict', [..._sel.conflict].join(','));
   const q = document.getElementById('search').value.trim();
   if (q) p.set('q', q);
   if (_activeTab && _activeTab !== 'prs') p.set('tab', _activeTab);
@@ -391,7 +395,7 @@ function _syncUrl(){
 function _applyUrlState(){
   const p = new URLSearchParams(location.search);
   let anyFilter = false;
-  ['status','review','ci'].forEach(dim => {
+  ['status','review','ci','conflict'].forEach(dim => {
     const v = p.get(dim);
     if (v){ v.split(',').filter(Boolean).forEach(x => _sel[dim].add(x)); anyFilter = true; }
   });
@@ -406,12 +410,14 @@ function _applyFilters(){
   const noStatus = _sel.status.size === 0;
   const noReview = _sel.review.size === 0;
   const noCi     = _sel.ci.size === 0;
+  const noConflict = _sel.conflict.size === 0;
   document.querySelectorAll('#pr-table tbody tr').forEach(row => {
     const statusOk = noStatus || _sel.status.has(row.dataset.status || '');
     const reviewOk = noReview || _sel.review.has(row.dataset.review || '');
     const ciOk     = noCi     || _sel.ci.has(row.dataset.ci || '');
+    const conflictOk = noConflict || _sel.conflict.has(row.dataset.conflict || '');
     const textOk   = !q || row.innerText.toLowerCase().includes(q);
-    row.style.display = (statusOk && reviewOk && ciOk && textOk) ? '' : 'none';
+    row.style.display = (statusOk && reviewOk && ciOk && conflictOk && textOk) ? '' : 'none';
   });
 }
 
@@ -486,6 +492,8 @@ function renderCards(prs){
   html += statCard("Needs Review", pending, "#9a6700", "review:PENDING");
   html += statCard("Changes Req.", changes, "#cf222e", "review:CHANGES_REQUESTED");
   if (byCi.failure) html += statCard("CI Failing", byCi.failure, "#cf222e", "ci:failure");
+  const conflicts = prs.filter(pr => pr.has_conflict).length;
+  if (conflicts) html += statCard("Conflicts", conflicts, "#cf222e", "conflict:yes");
   document.getElementById('cards').innerHTML = html;
 }
 
@@ -495,6 +503,9 @@ function renderPrTable(prs){
   prs.forEach(pr => {
     const statusVal = pr.draft ? "draft" : pr.status;
     let statusBadge = badge(statusVal, STATUS_COLOR[statusVal] || "#57606a");
+    if (pr.has_conflict)
+      statusBadge += '<div style="margin-top:3px">'
+        + badge("⚠ conflict", "#cf222e") + '</div>';
     const reviewBadge = badge(pr.review_decision, REVIEW_COLOR[pr.review_decision] || "#57606a");
     const ciBadge = badge(pr.ci_status, CI_COLOR[pr.ci_status] || "#57606a");
     const labelsHtml = (pr.labels && pr.labels.length)
@@ -513,7 +524,7 @@ function renderPrTable(prs){
       reviewDetail += '<div style="font-size:10px;color:#cf222e;margin-top:2px">✘ ' + esc(changesStr) + '</div>';
 
     html += '<tr data-status="' + esc(statusVal) + '" data-review="' + esc(pr.review_decision)
-         + '" data-ci="' + esc(pr.ci_status) + '">'
+         + '" data-ci="' + esc(pr.ci_status) + '" data-conflict="' + (pr.has_conflict ? "yes" : "no") + '">'
       + '<td style="white-space:nowrap"><a href="' + esc(pr.url) + '" target="_blank"'
         + ' style="font-weight:600;color:#0969da;text-decoration:none">#' + esc(pr.number) + '</a></td>'
       + '<td><a href="' + esc(pr.url) + '" target="_blank"'

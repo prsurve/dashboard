@@ -330,6 +330,30 @@ def _fetch_files_changed(pr_number: int, token: Optional[str]) -> int:
         return -1
 
 
+def _fetch_mergeable_state(pr_number: int, token: Optional[str]) -> str:
+    """Return the PR's merge-conflict state.
+
+    The ``/pulls`` *list* endpoint does not include conflict info — only the
+    single-PR GET (``/pulls/{number}``) returns ``mergeable_state``. GitHub
+    computes this asynchronously, so it may briefly be ``"unknown"`` while the
+    background job runs. Relevant values:
+
+        clean    — no conflicts, mergeable
+        dirty    — has merge conflicts (this is what we flag)
+        blocked  — mergeable but blocked by required reviews/checks
+        behind   — base branch moved ahead; needs an update
+        unstable — mergeable but a non-required check is failing
+        unknown  — not yet computed (or could not be fetched)
+    """
+    url = f"{API_BASE}/repos/{OWNER_REPO}/pulls/{pr_number}"
+    try:
+        pr = _get(url, token)
+        return pr.get("mergeable_state") or "unknown"
+    except Exception as exc:
+        logger.debug(f"Could not fetch mergeable_state for PR #{pr_number}: {exc}")
+        return "unknown"
+
+
 def _enrich_pr(pr: Dict, token: Optional[str], fetch_checks: bool) -> Dict[str, Any]:
     """Build the full enriched PR record."""
     number = pr["number"]
@@ -342,6 +366,14 @@ def _enrich_pr(pr: Dict, token: Optional[str], fetch_checks: bool) -> Dict[str, 
     reviews = _fetch_reviews(number, token)
     ci_status = _fetch_check_status(pr, token, fetch_checks)
     files_changed = _fetch_files_changed(number, token)
+
+    # Conflict status only makes sense for still-open PRs; skip the extra API
+    # call for merged/closed ones.
+    if pr.get("state") == "open" and not pr.get("merged_at"):
+        mergeable_state = _fetch_mergeable_state(number, token)
+    else:
+        mergeable_state = "unknown"
+    has_conflict = mergeable_state == "dirty"
 
     return {
         "number": number,
@@ -369,6 +401,8 @@ def _enrich_pr(pr: Dict, token: Optional[str], fetch_checks: bool) -> Dict[str, 
         "ci_status": ci_status,
         "base_branch": (pr.get("base") or {}).get("ref", ""),
         "head_branch": (pr.get("head") or {}).get("ref", ""),
+        "mergeable_state": mergeable_state,
+        "has_conflict": has_conflict,
     }
 
 
