@@ -144,11 +144,11 @@
           <td style="border:none;padding:6px 8px;font-size:18px;font-weight:700;color:#1a7f37" id="v-month">—</td>
         </tr>
         <tr>
-          <td style="border:none;padding:6px 8px;font-size:13px">Avg time to merge</td>
+          <td style="border:none;padding:6px 8px;font-size:13px">Avg time to merge (last 30d)</td>
           <td style="border:none;padding:6px 8px;font-size:18px;font-weight:700;color:#3b82d4" id="v-avg">—</td>
         </tr>
         <tr>
-          <td style="border:none;padding:6px 8px;font-size:13px">Median time to merge</td>
+          <td style="border:none;padding:6px 8px;font-size:13px">Median time to merge (last 30d)</td>
           <td style="border:none;padding:6px 8px;font-size:18px;font-weight:700;color:#3b82d4" id="v-med">—</td>
         </tr>
       </table>
@@ -297,6 +297,18 @@ function labelPill(name){
        + 'color:#24292f;background:#f6f8fa">' + esc(name) + '</span>';
 }
 function parseDt(iso){ if(!iso) return null; const d = new Date(iso); return isNaN(d)?null:d; }
+// Format a Date in the *viewer's* local timezone, e.g. "2026-10-30 13:09 GMT+5:30"
+function fmtLocal(d){
+  if (!d) return 'unknown';
+  return new Intl.DateTimeFormat('en-CA', {
+    year:'numeric', month:'2-digit', day:'2-digit',
+    hour:'2-digit', minute:'2-digit', hour12:false, timeZoneName:'short'
+  }).format(d).replace(',', '');
+}
+// UTC form, kept for tooltips so the absolute time is always available
+function fmtUtc(d){
+  return d ? d.toISOString().slice(0,16).replace('T',' ') + ' UTC' : 'unknown';
+}
 function daysSince(iso){ const d = parseDt(iso); return d ? Math.floor((Date.now()-d.getTime())/86400000) : 0; }
 function hoursBetween(a,b){ return (a&&b) ? Math.abs(b-a)/3.6e6 : null; }
 function fmtDur(v){
@@ -412,7 +424,10 @@ function _applyFilters(){
   const noCi     = _sel.ci.size === 0;
   const noConflict = _sel.conflict.size === 0;
   document.querySelectorAll('#pr-table tbody tr').forEach(row => {
-    const statusOk = noStatus || _sel.status.has(row.dataset.status || '');
+    const rowStatus = row.dataset.status || '';
+    // "Open" includes drafts (a draft is state=open on GitHub)
+    const statusOk = noStatus || _sel.status.has(rowStatus)
+                     || (_sel.status.has('open') && rowStatus === 'draft');
     const reviewOk = noReview || _sel.review.has(row.dataset.review || '');
     const ciOk     = noCi     || _sel.ci.has(row.dataset.ci || '');
     const conflictOk = noConflict || _sel.conflict.has(row.dataset.conflict || '');
@@ -481,9 +496,15 @@ function renderCards(prs){
     byCi[pr.ci_status]           = (byCi[pr.ci_status] || 0) + 1;
   });
   let html = statCard("Total PRs", prs.length, "#3b82d4", "all");
-  Object.keys(byStatus).sort().forEach(st => {
-    html += statCard(st.charAt(0).toUpperCase()+st.slice(1), byStatus[st],
-                     STATUS_COLOR[st] || "#57606a", st);
+  // A draft is an open PR on GitHub (state=open), so "Open" counts open + draft
+  // to stay consistent with GitHub's own Open tab and the rest of the dashboard.
+  // The Open filter also reveals draft rows (see _applyFilters).
+  const openTotal = (byStatus.open || 0) + (byStatus.draft || 0);
+  if (openTotal) html += statCard("Open", openTotal, STATUS_COLOR.open, "open");
+  if (byStatus.draft) html += statCard("Draft", byStatus.draft, STATUS_COLOR.draft, "draft");
+  ["merged","closed"].forEach(st => {
+    if (byStatus[st]) html += statCard(st.charAt(0).toUpperCase()+st.slice(1),
+                                       byStatus[st], STATUS_COLOR[st] || "#57606a", st);
   });
   const approved = byReview.APPROVED || 0;
   const pending  = (byReview.PENDING || 0) + (byReview.COMMENTED || 0);
@@ -569,7 +590,10 @@ function renderMetrics(prs){
     const created = parseDt(pr.created_at);
     const merged  = parseDt(pr.merged_at);
     const mt = hoursBetween(created, merged);
-    if (mt !== null) mergeTimes.push(mt);
+    // Merge-time stats are scoped to the last 30 days so the number tracks
+    // recent velocity. An all-time average over hundreds of merged PRs barely
+    // moves week to week and reads as "static".
+    if (mt !== null && merged && merged.getTime() >= monthCut) mergeTimes.push(mt);
     if (merged){
       if (merged.getTime() >= weekCut)  mergedWeek.push(pr);
       if (merged.getTime() >= monthCut) mergedMonth.push(pr);
@@ -588,8 +612,8 @@ function renderMetrics(prs){
   // metrics cards
   const stillOpen = Object.values(buckets).reduce((a,b)=>a+b,0);
   document.getElementById('metrics-cards').innerHTML =
-      statCard("Avg Merge Time", fmtDur(avg(mergeTimes)), "#3b82d4")
-    + statCard("Median Merge Time", fmtDur(median(mergeTimes)), "#3b82d4")
+      statCard("Avg Merge Time (30d)", fmtDur(avg(mergeTimes)), "#3b82d4")
+    + statCard("Median Merge Time (30d)", fmtDur(median(mergeTimes)), "#3b82d4")
     + statCard("Merged This Week", mergedWeek.length, "#1a7f37")
     + statCard("Merged This Month", mergedMonth.length, "#1a7f37")
     + statCard("Still Open", stillOpen, "#9a6700");
@@ -804,10 +828,13 @@ function render(payload){
   document.getElementById('footer-repo').textContent = repo;
 
   const gen = parseDt(payload.generated_at);
-  const genStr = gen ? gen.toISOString().slice(0,16).replace('T',' ') + ' UTC' : 'unknown';
-  document.getElementById('gen-info').textContent =
-    'Generated ' + genStr + ' · ' + prs.length + ' PR(s) matched';
-  document.getElementById('footer-gen').textContent = genStr;
+  const genLocal = fmtLocal(gen), genUtc = fmtUtc(gen);
+  const genEl = document.getElementById('gen-info');
+  genEl.textContent = 'Generated ' + genLocal + ' · ' + prs.length + ' PR(s) matched';
+  genEl.title = genUtc;   // hover to see the absolute UTC time
+  const footEl = document.getElementById('footer-gen');
+  footEl.textContent = genLocal;
+  footEl.title = genUtc;
 
   renderCards(prs);
   renderPrTable(prs);
