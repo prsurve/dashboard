@@ -297,6 +297,18 @@ function labelPill(name){
        + 'color:#24292f;background:#f6f8fa">' + esc(name) + '</span>';
 }
 function parseDt(iso){ if(!iso) return null; const d = new Date(iso); return isNaN(d)?null:d; }
+// Format a Date in the *viewer's* local timezone, e.g. "2026-10-30 13:09 GMT+5:30"
+function fmtLocal(d){
+  if (!d) return 'unknown';
+  return new Intl.DateTimeFormat('en-CA', {
+    year:'numeric', month:'2-digit', day:'2-digit',
+    hour:'2-digit', minute:'2-digit', hour12:false, timeZoneName:'short'
+  }).format(d).replace(',', '');
+}
+// UTC form, kept for tooltips so the absolute time is always available
+function fmtUtc(d){
+  return d ? d.toISOString().slice(0,16).replace('T',' ') + ' UTC' : 'unknown';
+}
 function daysSince(iso){ const d = parseDt(iso); return d ? Math.floor((Date.now()-d.getTime())/86400000) : 0; }
 function hoursBetween(a,b){ return (a&&b) ? Math.abs(b-a)/3.6e6 : null; }
 function fmtDur(v){
@@ -816,10 +828,13 @@ function render(payload){
   document.getElementById('footer-repo').textContent = repo;
 
   const gen = parseDt(payload.generated_at);
-  const genStr = gen ? gen.toISOString().slice(0,16).replace('T',' ') + ' UTC' : 'unknown';
-  document.getElementById('gen-info').textContent =
-    'Generated ' + genStr + ' · ' + prs.length + ' PR(s) matched';
-  document.getElementById('footer-gen').textContent = genStr;
+  const genLocal = fmtLocal(gen), genUtc = fmtUtc(gen);
+  const genEl = document.getElementById('gen-info');
+  genEl.textContent = 'Generated ' + genLocal + ' · ' + prs.length + ' PR(s) matched';
+  genEl.title = genUtc;   // hover to see the absolute UTC time
+  const footEl = document.getElementById('footer-gen');
+  footEl.textContent = genLocal;
+  footEl.title = genUtc;
 
   renderCards(prs);
   renderPrTable(prs);
