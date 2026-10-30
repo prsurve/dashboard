@@ -859,6 +859,23 @@ function render(payload){
 }
 
 // ── fetch + poll ────────────────────────────────────────────────────────────────
+// ── auto-reload when a new index.html is deployed ──────────────────────────────
+// The page reloads data.json live, but its own HTML/JS is cached by the browser,
+// so UI changes would otherwise need a manual hard-refresh. We watch this file's
+// ETag (falling back to Last-Modified); when it changes, a new build shipped and
+// we reload the page to pick up the new code. Only fires when index.html actually
+// changes — not on every hourly data refresh.
+let _indexVersion = null;
+async function checkForNewVersion(){
+  try {
+    const r = await fetch('./index.html?v=' + Date.now(), { method:'HEAD', cache:'no-store' });
+    const v = r.headers.get('ETag') || r.headers.get('Last-Modified');
+    if (!v) return;                         // can't tell — skip
+    if (_indexVersion === null){ _indexVersion = v; return; }  // first load: baseline
+    if (v !== _indexVersion) location.reload();
+  } catch (_) { /* network blip — try again next cycle */ }
+}
+
 async function load(){
   document.body.classList.add('refreshing');
   try {
@@ -866,6 +883,7 @@ async function load(){
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const payload = await resp.json();
     render(payload);
+    checkForNewVersion();   // reload the page if a newer build was deployed
   } catch (err) {
     if (DATA) setLive('stale', 'refresh failed — showing last data');
     else {
