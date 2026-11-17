@@ -31,6 +31,11 @@ secrets under **Settings → Secrets and variables → Actions**:
 - `JIRA_EMAIL` — your Red Hat Atlassian account email
 - `JIRA_API_TOKEN` — the API token
 
+**Required scopes** when creating the token:
+- `read:jira-work` — read access to issues and projects
+- `read:jira-user` — read access to user data
+- `read:account` — read access to account profile
+
 ## License
 
 Apache 2.0
